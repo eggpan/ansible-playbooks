@@ -1,0 +1,5 @@
+retry/*
+fact_cache/*
+group_vars/*
+host_vars/*
+.vscode
