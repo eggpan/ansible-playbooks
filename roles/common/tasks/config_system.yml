@@ -1,0 +1,30 @@
+---
+- block:
+  - name: ホスト名設定
+    hostname:
+      name: '{{ hostname }}'
+
+  - name: /etc/hosts にループバックアドレスのホスト名を設定
+    replace:
+      path: /etc/hosts
+      regexp: '^127.0.1.1\s+.+$'
+      replace: "127.0.1.1\t{{ hostname }}"
+  when: hostname is defined
+
+- name: タイムゾーンを Asia/Tokyo にセット
+  timezone:
+    name: Asia/Tokyo
+
+- block:
+  - name: localeをja_JP.UTF-8に変更
+    command: localectl set-locale LANG=ja_JP.UTF-8
+    register: result
+
+  - name: locale設定の反映
+    command: source /etc/locale.conf
+    when: result.changed
+
+  - name: facts再取得
+    setup:
+    when: result.changed
+  when: ansible_env.LANG | default('') != 'ja_JP.UTF-8'

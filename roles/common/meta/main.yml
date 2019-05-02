@@ -1,0 +1,5 @@
+galaxy_info:
+  author: eggpan
+  description: 共通設定
+  license: MIT
+  min_ansible_version: 2.5

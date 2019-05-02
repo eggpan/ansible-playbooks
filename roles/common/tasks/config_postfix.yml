@@ -1,0 +1,16 @@
+---
+- name: postfix main.cfの設定
+  ini_file:
+    path: /etc/postfix/main.cf
+    section: null
+    option: '{{ item.key }}'
+    value: '{{ item.value }}'
+  loop: "{{ postfix_main_config }}"
+  register: result
+  when: postfix_main_config is defined
+
+- name: restart postfix
+  systemd:
+    state: restarted
+    name: postfix
+  when: result.changed

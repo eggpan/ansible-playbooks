@@ -1,0 +1,21 @@
+---
+# パッケージのインストール
+- include: install.yml
+  tags: install
+- name: インストール済パッケージの取得
+  installed_packages:
+  register: installed
+
+# etckeeperの設定
+- include: config_etckeeper.yml
+  when: "'git' in installed.packages and 'etckeeper' in installed.packages"
+
+# ホスト名 / タイムゾーン / ロケールの設定
+- include: config_system.yml
+
+# Postfixの設定
+- include: config_postfix.yml
+  when: "'postfix' in installed.packages and postfix_main_config is defined"
+
+# ファイアウォール有効化 / ssh接続許可
+- include: config_ufw.yml

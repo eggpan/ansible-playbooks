@@ -1,0 +1,12 @@
+---
+- name: SSH接続許可
+  ufw:
+    rule: allow
+    name: OpenSSH
+    from_ip: 0.0.0.0/0
+
+- name: ファイアウォール有効化
+  ufw:
+    state: enabled
+    direction: incoming
+    policy: deny
