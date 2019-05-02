@@ -1,0 +1,10 @@
+---
+- name: ベースパッケージのインストール
+  apt:
+    name: '{{ base_packages }}'
+    update_cache: yes
+
+- name: 追加パッケージのインストール
+  apt:
+    name: '{{ add_packages }}'
+  when: add_packages is defined
