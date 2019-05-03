@@ -1,0 +1,6 @@
+---
+- hosts: kvm-01
+  roles:
+  - role: common
+  - role: kvm-host
+  become: yes

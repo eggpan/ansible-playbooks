@@ -1,0 +1,9 @@
+---
+- include: install.yml
+  tags: install
+- name: インストール済パッケージの取得
+  installed_packages:
+  register: installed
+
+- include: config_nfs.yml
+  when: "nfs_share_path is defined and 'nfs-kernel-server' in installed.packages"

@@ -1,0 +1,3 @@
+---
+- name: nfsの設定反映
+  command: exportfs -ra

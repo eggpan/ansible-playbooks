@@ -1,0 +1,11 @@
+---
+- name: KVM関連パッケージ / nfs serverのインストール
+  apt:
+    name:
+    - cloud-image-utils
+    - libguestfs-tools
+    - libvirt-bin
+    - python3-libvirt
+    - python3-lxml
+    - virtinst
+    - nfs-kernel-server
