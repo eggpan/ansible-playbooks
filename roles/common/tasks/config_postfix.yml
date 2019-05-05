@@ -5,7 +5,7 @@
     section: null
     option: '{{ item.key }}'
     value: '{{ item.value }}'
-  loop: "{{ postfix_main_config }}"
+  loop: "{{ postfix_main_config | dict2items }}"
   register: result
   when: postfix_main_config is defined
 

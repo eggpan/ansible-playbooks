@@ -9,18 +9,15 @@ base_packages:
 - postfix
 - vim
 
-# 追加でパッケージをインストールする場合は定義
-# add_packages:
-# - apache2
+#追加でパッケージをインストールする場合は定義
+#add_packages:
+#- apache2
 
-# サーバに設定するホスト名
-hostname: '{{ inventory_hostname }}'
+#サーバにホスト名を設定する場合は定義
+#hostname: '{{ inventory_hostname }}'
 
-# Postfixのmain.cfに追加設定をする場合はkey / valueの配列を定義
-# postfix_main_config:
-# - key: relayhost
-#   value: 'mail.example.com'
-# - key: myhostname
-#   value: '{{ hostname }}.example.com'
-# - key: mydestination
-#   value: '$myhostname, {{ hostname }}, localhost.localdomain, localhost'
+#Postfixのmain.cfに追加設定をする場合はkey / valueの配列を定義
+#postfix_main_config:
+#  relayhost: 'mail.example.com'
+#  myhostname: '{{ hostname }}.example.com'
+#  mydestination: '$myhostname, {{ hostname }}, localhost.localdomain, localhost'
