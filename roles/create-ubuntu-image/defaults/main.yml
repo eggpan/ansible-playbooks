@@ -1,0 +1,36 @@
+---
+# kvmのホスト。インベントリファイル上のホスト名で指定
+kvm_host: kvm
+
+# インストールする元イメージのURL
+kvm_image_url: https://cloud-images.ubuntu.com/bionic/current/bionic-server-cloudimg-amd64.img
+
+# ダウンロード先ディレクトリ
+kvm_image_dir: /var/lib/libvirt/images
+
+# 作成するイメージ名
+kvm_image_name: '{{ inventory_hostname }}'
+
+# 作成するイメージ名のスペック
+kvm_image_vcpus: 1
+kvm_image_memory: 512,maxmemory=1024
+kvm_image_size: 100G
+kvm_image_os_variant: ubuntu18.04
+
+# ubuntuユーザへログインするためにどちらかを設定
+#kvm_image_ssh_password: password
+#kvm_image_ssh_key: ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQCyaAIaDmmN9DLVmEiHh1XBnYMeeML0+NWKlLH8dfr6GtUVNz4yKhCeGjOV6leJmpnuRAuBAdvEXaPLUeIGOadbi1uSQLbnmELHndHjybVXaKsQklcKeTsnuRsPd7TFTWm6z0phaNGFYPti/S6RQ5t5VLyVp1TJCT5n2XcBAcYfl51xCsyABXHymaUAJhVlGqvocpKfKcTB2cqBvWl2PAi3j31lNqoonkA9w5LNOW5jqByE2MCNMGtsWxbhf32y/2hE1pe5kYT34fPe08CXC/0Sf41UkSe8F7N58zEnY1zViHixDoROXqVdHHF/1XYs5bM0SGDDQJK8UW/PIomdOCKX example@example.com
+
+# ネットワーク設定をする場合は定義
+#network_config: |
+#  version: 1
+#  config:
+#  - type: nameserver
+#    address:
+#    - 192.168.0.1
+#  - type: physical
+#    name: ens2
+#    subnets:
+#    - type: static
+#      address: 192.168.0.2/24
+#      gateway: 192.168.0.1

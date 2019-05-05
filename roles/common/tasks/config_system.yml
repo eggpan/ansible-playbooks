@@ -20,11 +20,8 @@
     command: localectl set-locale LANG=ja_JP.UTF-8
     register: result
 
-  - name: locale設定の反映
-    command: source /etc/locale.conf
+  - name: clear_facts
+    meta: clear_facts
     when: result.changed
 
-  - name: facts再取得
-    setup:
-    when: result.changed
   when: ansible_env.LANG | default('') != 'ja_JP.UTF-8'

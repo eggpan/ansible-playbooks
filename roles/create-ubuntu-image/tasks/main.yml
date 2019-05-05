@@ -1,0 +1,34 @@
+---
+- block:
+  - import_tasks: download.yml
+
+  - name: 仮想マシンのstatus取得
+    virt:
+      name: '{{ kvm_image_name }}'
+      command: status
+    register: virt
+    ignore_errors: yes
+
+  - import_tasks: create_new_image.yml
+    when: virt.failed
+
+  - name: シャットダウンしている仮想マシンの起動
+    virt:
+      name: '{{ kvm_image_name }}'
+      command: start
+    when: virt.status is defined and virt.status == 'shutdown'
+
+  - block:
+    - name: SSH接続の待機
+      wait_for:
+        port: 22
+        host: "{{ ansible_host | default(inventory_hostname) }}"
+        search_regex: OpenSSH
+        delay: 10
+    - name: 10秒待機
+      pause:
+        seconds: 10
+    when: virt.failed or (virt.status is defined and virt.status == 'shutdown')
+  
+  delegate_to: "{{ hostvars[kvm_host].ansible_host }}"
+  remote_user: '{{ kvm_host_user | default(ansible_user) }}'
