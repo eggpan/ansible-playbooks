@@ -1,0 +1,5 @@
+---
+- name: イメージファイルのダウンロード
+  get_url:
+    url: '{{ kvm_image_url }}'
+    dest: '{{ kvm_image_dir }}/bionic-server-cloudimg-amd64.img'

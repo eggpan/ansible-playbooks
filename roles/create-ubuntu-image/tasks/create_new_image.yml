@@ -1,0 +1,57 @@
+---
+- name: imgファイルの作成
+  command: qemu-img create -f qcow2 -b {{ kvm_image_dir }}/bionic-server-cloudimg-amd64.img {{ kvm_image_dir }}/{{ kvm_image_name }}.img
+
+- name: イメージサイズの変更
+  command: qemu-img resize {{ kvm_image_dir }}/{{ kvm_image_name }}.img {{ kvm_image_size }}
+
+- name: user-data configのコピー
+  template:
+    src: user-data.j2
+    dest: /tmp/user-data
+
+- name: cloud-init用イメージの作成 (user-data only)
+  command: cloud-localds {{ kvm_image_dir }}/config.img /tmp/user-data
+  when: network_config is not defined
+
+- block:
+  - name: network configのコピー
+    copy:
+      content: '{{ network_config }}'
+      dest: /tmp/network-config
+
+  - name: cloud-init用イメージの作成 (user-data and network-config)
+    command: cloud-localds -N /tmp/network-config {{ kvm_image_dir }}/config.img /tmp/user-data
+
+  - name: network configの削除
+    file:
+      path: /tmp/network-config
+      state: absent
+  when: network_config is defined
+
+- name: user-data configの削除
+  file:
+    path: /tmp/user-data
+    state: absent
+
+- name: イメージの起動
+  command: >
+    virt-install
+    --name {{ kvm_image_name }}
+    --vcpus {{ kvm_image_vcpus }}
+    --memory {{ kvm_image_memory }}
+    --os-variant {{ kvm_image_os_variant }}
+    --disk {{ kvm_image_dir }}/{{ kvm_image_name }}.img,device=disk,bus=virtio
+    --disk {{ kvm_image_dir }}/config.img,device=cdrom
+    --graphics none
+    --network {{ kvm_image_network | default('bridge:br0') }}
+    --noautoconsole
+    --import
+
+- name: cloud-init用イメージのイジェクト
+  command: virsh change-media {{ kvm_image_name }} hda --eject --config
+
+- name: user-data configの削除
+  file:
+    path: '{{ kvm_image_dir }}/config.img'
+    state: absent

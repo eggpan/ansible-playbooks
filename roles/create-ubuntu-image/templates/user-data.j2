@@ -1,0 +1,11 @@
+#cloud-config
+{% if kvm_image_ssh_password | default(false) %}
+password: {{ kvm_image_ssh_password }}
+chpasswd:
+  expire: False
+ssh_pwauth: True
+{% endif %}
+{% if kvm_image_ssh_key is defined %}
+ssh_authorized_keys:
+- {{ kvm_image_ssh_key }}
+{% endif %}
