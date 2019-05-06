@@ -1,7 +1,0 @@
----
-- name: etckeeper用のgit config設定
-  git_config:
-    name: user.email
-    repo: /etc
-    scope: local
-    value: '{{ ansible_user }}@{{ hostname | default("inventory_hostname") }}'

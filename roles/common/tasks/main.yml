@@ -6,10 +6,6 @@
   installed_packages:
   register: installed
 
-# etckeeperの設定
-- import_tasks: config_etckeeper.yml
-  when: "'git' in installed.packages and 'etckeeper' in installed.packages"
-
 # ホスト名 / タイムゾーン / ロケールの設定
 - import_tasks: config_system.yml
 
