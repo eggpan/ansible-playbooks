@@ -6,11 +6,5 @@
     option: '{{ item.key }}'
     value: '{{ item.value }}'
   loop: "{{ postfix_main_config | dict2items }}"
-  register: result
+  notify: restart postfix
   when: postfix_main_config is defined
-
-- name: restart postfix
-  systemd:
-    state: restarted
-    name: postfix
-  when: result.changed
