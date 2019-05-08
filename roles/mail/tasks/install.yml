@@ -1,0 +1,4 @@
+---
+- name : dovecot-pop3d のインストール
+  package:
+    name: dovecot-pop3d
