@@ -1,0 +1,8 @@
+---
+- import_tasks: install.yml
+
+- import_tasks: config_postfix.yml
+
+- import_tasks: config_dovecot.yml
+
+- import_tasks: config_ufw.yml

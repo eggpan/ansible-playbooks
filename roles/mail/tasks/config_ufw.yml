@@ -1,0 +1,10 @@
+---
+- name: smtp / smtps / pop3s接続許可
+  ufw:
+    rule: allow
+    from_ip: 0.0.0.0/0
+    to_port: "{{ item }}"
+  loop:
+  - smtp
+  - smtps
+  - pop3s

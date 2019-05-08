@@ -1,0 +1,41 @@
+### Postfixの設定項目 ###
+# header_checksを設定する場合記述
+#postfix_header_checks_regexp: |
+#  /^Received:.+(192\.168|10\.0)\./ IGNORE
+
+# smtp_sasl_password_mapsを設定する場合記述
+#postfix_smtp_sasl_password_maps: |
+#  [smtp.example.com]:587 smtp@example.com:password
+
+#sender_dependent_default_transport_maps_regexpを設定する場合記述
+#postfix_sender_dependent_default_transport_maps_regexp: |
+#  /^mailinglist@/   smtp:[smtp.sendgrid.net]:587
+
+#vmailbox_domains_regexp を設定する場合記述
+#postfix_vmailbox_domains_regexp: |
+#  /^example.\.com$/ ACCEPT
+#  /^other\.example.\.com$/ ACCEPT
+
+#vmailbox_maps_regexpを設定する場合記述
+#postfix_vmailbox_maps_regexp: |
+#  /^example@example.\.com$/   example.com/example/
+#  /^.+@example.\.com$/        example.com/others/
+#  /^.+@other\.example.\.com$/ example.com/others/
+
+
+### Dovecotの設定項目 ###
+#conf.d/10-mail.confの設定を変更する場合記述
+#dovecot_mail_config:
+# mail_location: maildir:/var/mail/vhosts/%d/%n
+
+#conf.d/auth-static.conf.extに追加設定を入れる場合記述
+#dovecot_auth_static: |
+#      userdb {
+#        driver = static
+#        args = uid=5000 gid=5000 home=/var/mail/vhosts/%d/%n
+#      }
+
+# 認証ユーザのファイルを設置する場合記述
+#dovecot_users: |
+#  example@example.com:{PLAIN}password
+#  others@example.com:{PLAIN}password

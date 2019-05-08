@@ -1,0 +1,50 @@
+---
+- name: Virtual Mailbox用ディレクトリの作成
+  file:
+    path: /var/mail/vhosts
+    state: directory
+    owner: 5000
+    group: 5000
+    mode: 02750
+  notify: restart postfix
+
+- name: header_checks.regexpの設定
+  blockinfile:
+    path: /etc/postfix/header_checks.regexp
+    block: '{{ postfix_header_checks_regexp }}'
+    create: yes
+  notify: restart postfix
+  when: postfix_header_checks_regexp is defined
+
+- name: sender_dependent_default_transport_maps.regexpの設定
+  blockinfile:
+    path: /etc/postfix/sender_dependent_default_transport_maps.regexp
+    block: '{{ postfix_sender_dependent_default_transport_maps_regexp }}'
+    create: yes
+    mode: 0600
+  notify: restart postfix
+  when: postfix_sender_dependent_default_transport_maps_regexp is defined
+
+- name: smtp_sasl_password_mapsの設定
+  blockinfile:
+    path: /etc/postfix/smtp_sasl_password_maps
+    block: '{{ postfix_smtp_sasl_password_maps }}'
+    create: yes
+  notify: postmap smtp_sasl_password_maps
+  when: postfix_smtp_sasl_password_maps is defined
+
+- name: vmailbox_domains.regexpの設定
+  blockinfile:
+    path: /etc/postfix/vmailbox_domains.regexp
+    block: '{{ postfix_vmailbox_domains_regexp }}'
+    create: yes
+  notify: restart postfix
+  when: postfix_vmailbox_domains_regexp is defined
+
+- name: vmailbox_maps.regexpの設定
+  blockinfile:
+    path: /etc/postfix/vmailbox_maps.regexp
+    block: '{{ postfix_vmailbox_maps_regexp }}'
+    create: yes
+  notify: restart postfix
+  when: postfix_vmailbox_maps_regexp is defined

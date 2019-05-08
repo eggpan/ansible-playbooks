@@ -1,0 +1,15 @@
+- hosts:
+  - kvm-servers
+
+- hosts:
+  - mail-servers
+  roles:
+  - role: create-ubuntu-image
+  gather_facts: no
+  become: yes
+
+- hosts: 
+  - mail-servers
+  roles:
+  - role: mail
+  become: yes

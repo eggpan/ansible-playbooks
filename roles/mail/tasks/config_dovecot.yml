@@ -1,0 +1,48 @@
+---
+- name: dovecot/conf.d/10-mail.confの設定
+  ini_file:
+    path: /etc/dovecot/conf.d/10-mail.conf
+    section: null
+    option: '{{ item.key }}'
+    value: '{{ item.value }}'
+  notify: restart dovecot
+  loop: '{{ dovecot_mail_config | dict2items }}'
+  when: dovecot_mail_config is defined
+
+- block:
+  - name: dovecot/conf.d/auth-static.conf.ext設定
+    blockinfile:
+      path: /etc/dovecot/conf.d/auth-static.conf.ext
+      block: '{{ dovecot_auth_static }}'
+    notify: restart dovecot
+
+  - name: dovecot/conf.d/10-auth.conf auth-static.conf.extの有効化
+    replace:
+      path: /etc/dovecot/conf.d/10-auth.conf
+      regexp: '^#(!include auth-static\.conf\.ext)$'
+      replace: '\1'
+    notify: restart dovecot
+  when: dovecot_auth_static is defined
+
+- block:
+  - name: dovecot/conf.d/10-auth.conf auth-passwdfile.conf.extの有効化
+    replace:
+      path: /etc/dovecot/conf.d/10-auth.conf
+      regexp: '^#(!include auth-passwdfile\.conf\.ext)$'
+      replace: '\1'
+    notify: restart dovecot
+
+  - name: usersファイルの設定
+    copy:
+      content: '{{ dovecot_users }}'
+      dest: /etc/dovecot/users
+    notify: restart dovecot
+  when: dovecot_users is defined
+
+- name: dovecot/conf.d/10-ssl.confの設定
+  blockinfile:
+    path: /etc/dovecot/conf.d/10-ssl.conf
+    insertafter: ^ssl_key
+    content: '{{ dovecot_ssl_config }}'
+  notify: restart dovecot
+  when: dovecot_ssl_config is defined

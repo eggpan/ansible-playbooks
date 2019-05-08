@@ -1,0 +1,8 @@
+---
+- name: restart dooecot
+  systemd:
+    state: restarted
+    name: dovecot
+
+- name: postmap smtp_sasl_password_maps and reload
+  shell: postmap /etc/postfix/smtp_sasl_password_maps && systemctl reload postfix
