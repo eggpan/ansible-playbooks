@@ -3,7 +3,6 @@
 base_packages:
 - curl
 - git
-- etckeeper
 - language-pack-ja
 - mailutils
 - postfix
