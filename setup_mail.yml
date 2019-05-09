@@ -4,7 +4,7 @@
 - hosts:
   - mail-servers
   roles:
-  - role: create-ubuntu-image
+  - role: create_ubuntu_image
   gather_facts: no
   become: yes
 
