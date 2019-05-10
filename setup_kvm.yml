@@ -2,5 +2,5 @@
 - hosts: kvm-01
   roles:
   - role: common
-  - role: kvm-host
+  - role: kvm
   become: yes
