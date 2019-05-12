@@ -30,7 +30,7 @@
     path: /etc/postfix/smtp_sasl_password_maps
     block: '{{ postfix_smtp_sasl_password_maps }}'
     create: yes
-  notify: postmap smtp_sasl_password_maps
+  notify: postmap smtp_sasl_password_maps and reload
   when: postfix_smtp_sasl_password_maps is defined
 
 - name: vmailbox_domains.regexpの設定
