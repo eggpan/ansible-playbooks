@@ -1,0 +1,57 @@
+---
+- name: デフォルトの.xprofile設定ファイルの作成
+  blockinfile:
+    path: /etc/skel/.xprofile
+    create: yes
+    block: |
+      export LANG=ja_JP.UTF-8
+      export GTK_IM_MODULE=fcitx
+      export QT_IM_MODULE=fcitx
+      export XMODIFIERS=@im=fcitx
+
+# pulseaudioの設定
+
+- name: /etc/skel/のコピー
+  copy:
+    src: etc/skel/
+    dest: /etc/skel/
+
+- name: archユーザの作成
+  user:
+    name: arch
+    groups: wheel
+    password: ''
+    append: yes
+
+- name: archユーザにssh鍵を設定
+  authorized_key:
+    user: arch
+    state: present
+    key: https://github.com/eggpan.keys
+
+- name: wheelグループに対してsudo許可
+  lineinfile:
+    path: /etc/sudoers
+    regexp: '%wheel.+NOPASSWD'
+    line: '%wheel ALL=(ALL) NOPASSWD: ALL'
+    validate: '/usr/sbin/visudo -cf %s'
+
+- name: タイムゾーンの設定
+  timezone:
+    name: Asia/Tokyo
+
+- name: ロケールの設定
+  locale_gen:
+    name: '{{ item }}'
+  loop:
+  - en_US.UTF-8
+  - ja_JP.UTF-8
+
+# - name: デフォルトロケールの設定
+#   copy:
+#     src: etc/locale.conf
+#     dest: /etc/locale.conf
+
+- name: パッケージインストール
+  include: install.yml
+  tags: install

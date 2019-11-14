@@ -1,0 +1,7 @@
+---
+- name: check apache2/ports.conf
+  stat: 
+    path: /etc/apache2/ports.conf
+  register: result
+
+# バーチャルサーバ設定

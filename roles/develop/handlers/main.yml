@@ -1,0 +1,10 @@
+---
+- name: restart apache2
+  systemd:
+    state: restarted
+    name: apache2
+
+- name: restart nginx
+  systemd:
+    state: restarted
+    name: nginx

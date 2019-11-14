@@ -1,0 +1,50 @@
+---
+- name: lxqt関連のパッケージインストール
+  pacman:
+    name:
+    - alsa-utils
+    - discord
+    - fcitx-configtool
+    - fcitx-im
+    - fcitx-mozc
+    - firefox-i18n-ja
+    - gvim 
+    - lxqt
+    - mesa
+    - noto-fonts
+    - noto-fonts-cjk
+    - noto-fonts-emoji
+    - oxygen-icons
+    - pulseaudio
+    - pavucontrol-qt
+    - sddm
+    - ttf-hack
+    - xorg-server
+    #- xf86-video-intel
+    - xf86-video-ati
+    - xorg-xinit
+    update_cache: yes
+  tags: pacman
+
+- name: sddmの有効化
+  systemd:
+    name: sddm
+    enabled: yes
+
+- name: yayコマンドのインストール / パッケージ追加
+  become: yes
+  become_user: arch
+  ignore_errors: '{{ ansible_check_mode }}'
+  block:
+  - name: yayのインストール
+    aur:
+      name: yay
+      use: makepkg
+      skip_installed: yes
+
+  - name: 各種パッケージインストール(AUR)
+    aur:
+      name:
+      - google-chrome
+      - visual-studio-code-bin
+      skip_installed: yes
