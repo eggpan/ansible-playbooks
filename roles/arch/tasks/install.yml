@@ -19,9 +19,9 @@
     - pavucontrol-qt
     - sddm
     - ttf-hack
-    - xorg-server
-    #- xf86-video-intel
+    - xarchiver
     - xf86-video-ati
+    - xorg-server
     - xorg-xinit
     update_cache: yes
   tags: pacman
