@@ -1,0 +1,13 @@
+---
+install_packages:
+- archlinux-keyring
+- bash-completion
+- docker
+- docker-compose
+- php
+- php-intl
+- php-sqlite
+- python-pip
+- ruby
+- unzip
+- zip

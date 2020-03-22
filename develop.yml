@@ -3,3 +3,4 @@ all:
   hosts:
     develop:
     arch:
+    arch_cli:

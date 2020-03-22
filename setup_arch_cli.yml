@@ -1,0 +1,4 @@
+- hosts:
+  - arch_cli
+  roles:
+  - role: arch_cli

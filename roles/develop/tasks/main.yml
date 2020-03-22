@@ -1,9 +1,6 @@
 ---
-- installed_packages:
-  register: installed
-
 - name: include vars
-  include_vars: '{{ ansible_distribution | lower }}_{{ ansible_distribution_version }}.yml'
+  include_vars: '{{ ansible_distribution | lower }}_{{ ansible_distribution_version | lower }}.yml'
 
 - name: ディストリビューションごとのパッケージインストール
   include: install_{{ ansible_distribution | lower }}.yml
@@ -17,18 +14,3 @@
 # + echo 'deb-src https://deb.nodesource.com/node_12.x eoan main' >> /etc/apt/sources.list.d/nodesource.list
 
 
-- name: create mariadb user
-  mysql_user:
-    name: mariadb
-    password: password
-    priv: '*.*:ALL'
-    host: '{{ item }}'
-  loop:
-  - '%'
-  - 'localhost'
-
-- name: apacheコンフィグの設定
-  include: config_apache.yml
-  tags: apache
-
-# mariadbのセットアップ
