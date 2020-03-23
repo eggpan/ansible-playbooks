@@ -1,0 +1,23 @@
+---
+- name: OSの各種設定
+  include: config_os.yml
+
+- name: パッケージインストール
+  include: install_{{ ansible_distribution | lower }}.yml
+  tags: install
+
+- name: postfixのコンフィグ設定
+  include: config_postfix.yml
+  tags: postfix
+
+- name: dovecotのコンフィグ設定
+  include: config_dovecot.yml
+  tags: dovecot
+
+- name: opendkimのコンフィグ設定
+  include: config_opendkim.yml
+  tags: opendkim
+
+- name: haproxyのコンフィグ設定
+  include: config_haproxy.yml
+  tags: haproxy

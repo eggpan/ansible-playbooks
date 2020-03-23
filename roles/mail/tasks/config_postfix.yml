@@ -1,0 +1,90 @@
+---
+- name: header_checksの設置
+  lineinfile:
+    path: /etc/postfix/header_checks
+    line: '/^Received:/ IGNORE'
+    create: yes
+
+- name: メールボックス用ディレクトリの作成
+  file:
+    path: /var/mail/vhosts
+    state: directory
+    owner: "5000"
+    group: "5000"
+    mode: '0750'
+
+- name: postfix config
+  ini_file:
+    path: /etc/postfix/main.cf
+    section: null
+    option: '{{ item.name }}'
+    value: '{{ item.value }}'
+  loop:
+  - name: header_checks
+    value: regexp:/etc/postfix/header_checks
+  - name: header_size_limit
+    value: "4096000"
+  - name: home_mailbox
+    value: Maildir/
+  - name: smtpd_banner
+    value: mailserver ESMTP
+  - name: virtual_gid_maps
+    value: static:5000
+  - name: virtual_mailbox_base
+    value: /var/mail/vhosts
+  - name: virtual_mailbox_domains
+    value: '{{ virtual_mailbox_domains | default("example.com") }}'
+  - name: virtual_mailbox_maps
+    value: regexp:/etc/postfix/vmailbox_maps.regexp
+  - name: virtual_uid_maps
+    value: static:5000
+  notify: restart postfix
+  tags: main.cf
+
+- name: mailboxの設定
+  blockinfile:
+    path: /etc/postfix/vmailbox_maps.regexp
+    block: '{{ virtual_mailbox_maps | default("/^.+@example\.com$/  example.com/example/") }}'
+    create: yes
+
+- name: check file sasl_passwd.db
+  stat:
+    path: /etc/postfix/sasl_passwd.db
+  register: sasl_passwd
+
+- block:
+  - name: sendgrid api_keyの書き込み
+    lineinfile:
+      path: /etc/postfix/sasl_passwd
+      line: '[smtp.sendgrid.net]:2525 apikey:{{ sendgrid_api_key }}'
+      create: yes
+
+  - name: postmapの実行
+    command: postmap /etc/postfix/sasl_passwd
+    notify: restart postfix
+
+  - name: sasl_passwdの元ファイルを削除
+    file:
+      path: /etc/postfix/sasl_passwd
+      state: absent
+
+  - name: sendgrid sasl用のコンフィグ
+    ini_file:
+      path: /etc/postfix/main.cf
+      section: null
+      option: '{{ item.name }}'
+      value: '{{ item.value }}'
+    loop:
+    - name: relayhost
+      value: "[smtp.sendgrid.net]:2525"
+    - name: smtp_sasl_auth_enable
+      value: "yes"
+    - name: smtp_sasl_password_maps
+      value: hash:/etc/postfix/sasl_passwd
+    - name: smtp_sasl_security_options
+      value: noanonymous
+    - name: smtp_tls_security_level
+      value: encrypt
+    notify: restart postfix
+
+  when: sendgrid_api_key is defined and not sasl_passwd.stat.exists

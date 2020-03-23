@@ -1,0 +1,80 @@
+---
+- name: dovecot sslを利用しない設定に変更
+  ini_file:
+    path: /etc/dovecot/conf.d/10-ssl.conf
+    section: null
+    option: ssl
+    value: "no"
+  notify: restart dovecot
+
+- name: dovecot mail_location設定
+  ini_file:
+    path: /etc/dovecot/conf.d/10-mail.conf
+    section: null
+    option: mail_location
+    value: "maildir:/var/mail/vhosts/%d/%n"
+  notify: restart dovecot
+
+- name: dovecot auth-static.conf.extの有効化
+  lineinfile: 
+    path: /etc/dovecot/conf.d/10-auth.conf
+    regexp: '#(!include auth-static\.conf\.ext)'
+    line: '\1'
+    backrefs: yes
+  notify: restart dovecot
+
+- name: dovecot auth-passwdfile.conf.extの有効化
+  lineinfile: 
+    path: /etc/dovecot/conf.d/10-auth.conf
+    regexp: '#(!include auth-passwdfile\.conf\.ext)'
+    line: '\1'
+    backrefs: yes
+  notify: restart dovecot
+
+- name: auth-static.conf.extの設定
+  blockinfile:
+    path: /etc/dovecot/conf.d/auth-static.conf.ext 
+    block: |
+      userdb {
+        driver = static
+        args = uid=5000 gid=5000 home=/var/mail/vhosts/%d/%n
+      }
+
+- name: dovecot postfix連携用の設定
+  blockinfile:
+    path: /etc/dovecot/conf.d/10-postfix-auth.conf
+    create: yes
+    block: |
+      service auth {
+        unix_listener /var/spool/postfix/private/auth {
+          mode = 0660
+          user = postfix
+          group = postfix
+        }
+      }
+
+- name: postfix dovecot連携用の設定
+  ini_file:
+    path: /etc/postfix/main.cf
+    section: null
+    option: '{{ item.name }}'
+    value: '{{ item.value }}'
+  notify: restart postfix
+  loop:
+  - name: smtpd_sasl_path
+    value: private/auth
+  - name: smtpd_sasl_type
+    value: dovecot
+
+- name: postfix submissionポートの設定
+  blockinfile: 
+    path: /etc/postfix/master.cf
+    insertbefore: '^#smtps'
+    block: |
+      submission inet n       -       y       -       -       smtpd
+        -o syslog_name=postfix/submission
+        -o smtpd_tls_security_level=may
+        -o smtpd_sasl_auth_enable=yes
+        -o smtpd_client_restrictions=permit_sasl_authenticated,reject
+        -o smtpd_relay_restrictions=permit_sasl_authenticated,reject
+        -o milter_macro_daemon_name=ORIGINATING

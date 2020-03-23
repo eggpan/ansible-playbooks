@@ -1,0 +1,69 @@
+---
+- name: postfix opendkim用のconfig
+  ini_file:
+    path: /etc/postfix/main.cf
+    section: null
+    option: '{{ item.name }}'
+    value: '{{ item.value }}'
+  loop:
+  - name: milter_default_action
+    value: accept
+  - name: smtpd_milters
+    value: inet:localhost:8892
+  - name: non_smtpd_milters
+    value: $smtpd_milters
+  notify: restart postfix
+
+- name: opendkimのコンフィグ設定
+  lineinfile:
+    path: /etc/opendkim.conf
+    regexp: '{{ item.regexp }}'
+    line: '{{ item.line }}'
+    backrefs: yes
+  loop:
+  - regexp: '^(Socket\s+).+'
+    line: '\1inet:8892@localhost'
+  - regexp: '^#(Canonicalization\s+).+'
+    line: '\1relaxed/relaxed'
+
+- name: opendkimのコンフィグ設定追加
+  lineinfile:
+    path: /etc/opendkim.conf
+    line: '{{ item }}'
+  loop:
+  - 'KeyTable              /etc/opendkim/KeyTable'
+  - 'SigningTable          refile:/etc/opendkim/SigningTable'
+  - 'SyslogSuccess         yes'
+
+- name: opendkim keyfileの確認
+  stat:
+    path: '/etc/opendkim/keys/{{ opendkim_domainkeys.domain }}/{{ opendkim_domainkeys.selector }}.private'
+  register: opndkim_keyfile
+
+- block:
+  - name: keyfile用のディレクトリ作成
+    file:
+      path: /etc/opendkim/keys/{{ opendkim_domainkeys.domain }}
+      state: directory
+
+  - name: keyfileの作成
+    shell: 'openssl genrsa -out /etc/opendkim/keys/{{ opendkim_domainkeys.domain }}/{{ opendkim_domainkeys.selector }}.private 1024 2>/dev/null'
+
+  - name: keyfileのownerをopendkimに変更
+    file:
+      path: '/etc/opendkim/keys/{{ opendkim_domainkeys.domain }}/{{ opendkim_domainkeys.selector }}.private'
+      owner: opendkim
+
+  - name: SigningTableの作成
+    lineinfile:
+      path: /etc/opendkim/SigningTable
+      line: '*@{{ opendkim_domainkeys.domain }} {{ opendkim_domainkeys.selector }}._domainkey.{{ opendkim_domainkeys.domain }}'
+      create: yes
+
+  - name: KeyTableの作成
+    lineinfile:
+      path: /etc/opendkim/KeyTable
+      line: '{{ opendkim_domainkeys.selector }}._domainkey.{{ opendkim_domainkeys.domain }} {{ opendkim_domainkeys.domain }}:{{ opendkim_domainkeys.selector }}:/etc/opendkim/keys/{{ opendkim_domainkeys.domain }}/{{ opendkim_domainkeys.selector }}.private'
+      create: yes
+
+  when: not opndkim_keyfile.stat.exists

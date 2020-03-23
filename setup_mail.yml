@@ -1,0 +1,5 @@
+- hosts:
+  - gce
+  roles:
+  - role: mail
+  become: true
