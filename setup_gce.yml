@@ -2,4 +2,5 @@
   - gce
   roles:
   - role: mail
+  - role: mariadb
   become: true

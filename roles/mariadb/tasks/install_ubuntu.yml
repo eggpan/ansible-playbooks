@@ -1,0 +1,17 @@
+- name: 各種パッケージのインストール
+  apt:
+    name: 
+    - mariadb-server
+    update_cache: yes
+
+- name: config設定
+  ini_file:
+    path: /etc/mysql/mariadb.conf.d/50-server.cnf
+    section: mysqld
+    option: '{{ item.option }}'
+    value: '{{ item.value }}'
+  loop:
+  - option: port
+    value: '33060'
+  - option: bind-address
+    value: '0.0.0.0'
