@@ -12,6 +12,7 @@
   apt:
     name: 
     - dovecot-pop3d
+    - dovecot-imapd
     - mailutils
     - opendkim
     - postfix
