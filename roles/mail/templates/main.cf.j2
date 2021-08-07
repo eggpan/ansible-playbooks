@@ -1,0 +1,36 @@
+alias_maps = hash:/etc/aliases
+biff = no
+compatibility_level = 3
+header_checks = regexp:/etc/postfix/header_checks.regexp
+header_size_limit = 4096000
+home_mailbox = Maildir/
+{% if myhostname is defined %}
+myhostname = {{ myhostname }}
+{% endif %}
+smtpd_banner = mailserver ESMTP
+virtual_gid_maps = static:5000
+virtual_mailbox_base = /var/mail/vhosts
+virtual_mailbox_domains = {{ virtual_mailbox_domains | default("example.com") }}
+virtual_mailbox_maps = regexp:/etc/postfix/virtual_mailbox_maps.regexp
+virtual_uid_maps = static:5000
+
+# relay settings
+{% if relayhost is defined %}
+relayhost = {{ relayhost }}
+{% endif %}
+smtp_sasl_auth_enable = yes
+{% if smtp_sasl_password_maps is defined %}
+smtp_sasl_password_maps = hash:/etc/postfix/smtp_sasl_password_maps
+{% endif %}
+smtp_sasl_security_options = noanonymous
+smtp_tls_security_level = encrypt
+
+# smtp auth settings
+smtpd_sasl_path = private/auth
+smtpd_sasl_type = dovecot
+smtpd_tls_cert_file = /etc/ssl/certs/ssl-cert-snakeoil.pem
+smtpd_tls_key_file = /etc/ssl/private/ssl-cert-snakeoil.key
+smtpd_tls_security_level = may
+{% if tls_server_sni_maps is defined %}
+tls_server_sni_maps = hash:/etc/postfix/tls_server_sni_maps
+{% endif %}

@@ -1,7 +1,0 @@
----
-- name: haproxyのコンフィグ設定
-  blockinfile:
-    path: /etc/haproxy/haproxy.cfg
-    block: '{{ haproxy_conf }}'
-  notify: restart haproxy
-  when: haproxy_conf is defined

@@ -1,12 +1,4 @@
 ---
-- name: dovecot sslを利用しない設定に変更
-  ini_file:
-    path: /etc/dovecot/conf.d/10-ssl.conf
-    section: null
-    option: ssl
-    value: "no"
-  notify: restart dovecot
-
 - name: dovecot mail_location設定
   ini_file:
     path: /etc/dovecot/conf.d/10-mail.conf
@@ -16,7 +8,7 @@
   notify: restart dovecot
 
 - name: dovecot auth-static.conf.extの有効化
-  lineinfile: 
+  lineinfile:
     path: /etc/dovecot/conf.d/10-auth.conf
     regexp: '#(!include auth-static\.conf\.ext)'
     line: '\1'
@@ -24,7 +16,7 @@
   notify: restart dovecot
 
 - name: dovecot auth-passwdfile.conf.extの有効化
-  lineinfile: 
+  lineinfile:
     path: /etc/dovecot/conf.d/10-auth.conf
     regexp: '#(!include auth-passwdfile\.conf\.ext)'
     line: '\1'
@@ -33,7 +25,7 @@
 
 - name: auth-static.conf.extの設定
   blockinfile:
-    path: /etc/dovecot/conf.d/auth-static.conf.ext 
+    path: /etc/dovecot/conf.d/auth-static.conf.ext
     block: |
       userdb {
         driver = static
@@ -53,28 +45,20 @@
         }
       }
 
-- name: postfix dovecot連携用の設定
-  ini_file:
-    path: /etc/postfix/main.cf
-    section: null
-    option: '{{ item.name }}'
-    value: '{{ item.value }}'
-  notify: restart postfix
-  loop:
-  - name: smtpd_sasl_path
-    value: private/auth
-  - name: smtpd_sasl_type
-    value: dovecot
+- name: users ファイルの作成
+  blockinfile:
+    path: /etc/dovecot/users
+    block: '{{ dovecot.users }}'
+    group: dovecot
+    mode: 0640
+    create: yes
+  when: dovecot.users is defined
+  notify: restart dovecot
 
-- name: postfix submissionポートの設定
-  blockinfile: 
-    path: /etc/postfix/master.cf
-    insertbefore: '^#smtps'
-    block: |
-      submission inet n       -       y       -       -       smtpd
-        -o syslog_name=postfix/submission
-        -o smtpd_tls_security_level=may
-        -o smtpd_sasl_auth_enable=yes
-        -o smtpd_client_restrictions=permit_sasl_authenticated,reject
-        -o smtpd_relay_restrictions=permit_sasl_authenticated,reject
-        -o milter_macro_daemon_name=ORIGINATING
+- name: dovecot certs の設定
+  blockinfile:
+    path: /etc/dovecot/conf.d/10-ssl.conf
+    block: '{{ dovecot.certs }}'
+    create: yes
+  when: dovecot.certs is defined
+  notify: restart dovecot

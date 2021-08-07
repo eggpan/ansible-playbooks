@@ -1,23 +1,4 @@
 ---
-haproxy_conf: |
-  frontend smtps
-      mode tcp
-      bind *:465 ssl crt /etc/haproxy/certs
-      default_backend backend_submission
-
-  frontend pop3s
-      mode tcp
-      bind *:995 ssl crt /etc/haproxy/certs
-      default_backend backend_pop3
-
-  backend backend_submission
-      mode tcp
-      server submission localhost:587
-
-  backend backend_pop3
-      mode tcp
-      server pop3 localhost:110
-
 opendkim_domainkeys:
   domain: example.com
   selector: 20200101

@@ -1,0 +1,6 @@
+---
+all:
+  hosts:
+    aws-mail:
+      ansible_host: 35.75.189.173
+      ansible_ssh_user: ubuntu

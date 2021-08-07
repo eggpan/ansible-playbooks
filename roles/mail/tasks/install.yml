@@ -1,0 +1,12 @@
+---
+- name: 各種パッケージのインストール
+  ansible.builtin.apt:
+    name:
+      - dovecot-pop3d
+      - dovecot-imapd
+      - mailutils
+      - opendkim
+      - postfix
+      - python3-certbot-dns-cloudflare
+    force_apt_get: yes
+    update_cache: yes

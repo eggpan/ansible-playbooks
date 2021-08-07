@@ -1,9 +1,24 @@
 ---
-- name: header_checksの設置
-  lineinfile:
-    path: /etc/postfix/header_checks
-    line: '/^Received:/ IGNORE'
-    create: yes
+- name: postfix/main.cf の作成
+  ansible.builtin.template:
+    src: main.cf.j2
+    dest: /etc/postfix/main.cf
+  notify: restart postfix
+
+- name: postfix/master.cf submissionポートの設定
+  blockinfile:
+    path: /etc/postfix/master.cf
+    insertbefore: '^#smtps'
+    block: |
+      submission inet n       -       y       -       -       smtpd
+        -o syslog_name=postfix/submission
+        -o smtpd_tls_security_level=encrypt
+        -o smtpd_sasl_auth_enable=yes
+        -o smtpd_tls_auth_only=yes
+        -o smtpd_client_restrictions=permit_sasl_authenticated,reject
+        -o smtpd_relay_restrictions=permit_sasl_authenticated,reject
+        -o milter_macro_daemon_name=ORIGINATING
+  notify: restart postfix
 
 - name: メールボックス用ディレクトリの作成
   file:
@@ -11,80 +26,40 @@
     state: directory
     owner: "5000"
     group: "5000"
-    mode: '0750'
+    mode: 0700
 
-- name: postfix config
-  ini_file:
-    path: /etc/postfix/main.cf
-    section: null
-    option: '{{ item.name }}'
-    value: '{{ item.value }}'
-  loop:
-  - name: header_checks
-    value: regexp:/etc/postfix/header_checks
-  - name: header_size_limit
-    value: "4096000"
-  - name: home_mailbox
-    value: Maildir/
-  - name: smtpd_banner
-    value: mailserver ESMTP
-  - name: virtual_gid_maps
-    value: static:5000
-  - name: virtual_mailbox_base
-    value: /var/mail/vhosts
-  - name: virtual_mailbox_domains
-    value: '{{ virtual_mailbox_domains | default("example.com") }}'
-  - name: virtual_mailbox_maps
-    value: regexp:/etc/postfix/vmailbox_maps.regexp
-  - name: virtual_uid_maps
-    value: static:5000
-  notify: restart postfix
-  tags: main.cf
-
-- name: mailboxの設定
-  blockinfile:
-    path: /etc/postfix/vmailbox_maps.regexp
-    block: '{{ virtual_mailbox_maps | default("/^.+@example\.com$/  example.com/example/") }}'
+- name: header_checks.regexp の作成
+  lineinfile:
+    path: /etc/postfix/header_checks.regexp
+    line: '/^Received:/ IGNORE'
     create: yes
+  notify: restart postfix
 
-- name: check file sasl_passwd.db
-  stat:
-    path: /etc/postfix/sasl_passwd.db
-  register: sasl_passwd
+- name: virtual_mailbox_maps.regexp の作成
+  blockinfile:
+    path: /etc/postfix/virtual_mailbox_maps.regexp
+    block: '{{ virtual_mailbox_maps | default("/^.+@example\.com$/ example.com/example/") }}'
+    create: yes
+  notify: restart postfix
 
-- block:
-  - name: sendgrid api_keyの書き込み
-    lineinfile:
-      path: /etc/postfix/sasl_passwd
-      line: '[smtp.sendgrid.net]:2525 apikey:{{ sendgrid_api_key }}'
-      create: yes
+- name: smtp_sasl_password_maps の作成
+  blockinfile:
+    path: /etc/postfix/smtp_sasl_password_maps
+    block: '{{ smtp_sasl_password_maps }}'
+    mode: 0600
+    create: yes
+  when: smtp_sasl_password_maps is defined
+  notify:
+    - postmap smtp_sasl_password_maps
+    - restart postfix
 
-  - name: postmapの実行
-    command: postmap /etc/postfix/sasl_passwd
-    notify: restart postfix
-
-  - name: sasl_passwdの元ファイルを削除
-    file:
-      path: /etc/postfix/sasl_passwd
-      state: absent
-
-  - name: sendgrid sasl用のコンフィグ
-    ini_file:
-      path: /etc/postfix/main.cf
-      section: null
-      option: '{{ item.name }}'
-      value: '{{ item.value }}'
-    loop:
-    - name: relayhost
-      value: "[smtp.sendgrid.net]:2525"
-    - name: smtp_sasl_auth_enable
-      value: "yes"
-    - name: smtp_sasl_password_maps
-      value: hash:/etc/postfix/sasl_passwd
-    - name: smtp_sasl_security_options
-      value: noanonymous
-    - name: smtp_tls_security_level
-      value: encrypt
-    notify: restart postfix
-
-  when: sendgrid_api_key is defined and not sasl_passwd.stat.exists
+- name: tls_server_sni_maps の作成
+  blockinfile:
+    path: /etc/postfix/tls_server_sni_maps
+    block: '{{ tls_server_sni_maps }}'
+    mode: 0600
+    create: yes
+  when: tls_server_sni_maps is defined
+  notify:
+    - postmap tls_server_sni_maps
+    - restart postfix

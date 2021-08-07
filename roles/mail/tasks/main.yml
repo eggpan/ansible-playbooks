@@ -1,23 +1,16 @@
 ---
 - name: OSの各種設定
-  include: config_os.yml
+  ansible.builtin.import_tasks: config_os.yml
 
 - name: パッケージインストール
-  include: install_{{ ansible_distribution | lower }}.yml
+  ansible.builtin.import_tasks: install.yml
   tags: install
 
 - name: postfixのコンフィグ設定
-  include: config_postfix.yml
-  tags: postfix
+  ansible.builtin.import_tasks: config_postfix.yml
 
 - name: dovecotのコンフィグ設定
-  include: config_dovecot.yml
-  tags: dovecot
+  import_tasks: config_dovecot.yml
 
-- name: opendkimのコンフィグ設定
-  include: config_opendkim.yml
-  tags: opendkim
-
-- name: haproxyのコンフィグ設定
-  include: config_haproxy.yml
-  tags: haproxy
+# - name: opendkimのコンフィグ設定
+#   import_tasks: config_opendkim.yml

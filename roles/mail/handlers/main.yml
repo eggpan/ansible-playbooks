@@ -1,4 +1,10 @@
 ---
+- name: postmap smtp_sasl_password_maps
+  ansible.builtin.command: postmap /etc/postfix/smtp_sasl_password_maps
+
+- name: postmap tls_server_sni_maps
+  ansible.builtin.command: postmap -F /etc/postfix/tls_server_sni_maps
+
 - name: restart postfix
   systemd:
     state: restarted
@@ -8,8 +14,3 @@
   systemd:
     state: restarted
     name: dovecot
-
-- name: restart haproxy
-  systemd:
-    state: restarted
-    name: haproxy
