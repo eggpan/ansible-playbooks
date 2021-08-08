@@ -14,3 +14,8 @@
   systemd:
     state: restarted
     name: dovecot
+
+- name: restart opendkim
+  systemd:
+    state: restarted
+    name: opendkim
