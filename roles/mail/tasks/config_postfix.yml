@@ -53,6 +53,13 @@
     - postmap smtp_sasl_password_maps
     - restart postfix
 
+- name: client_access.regexp の作成
+  lineinfile:
+    path: /etc/postfix/client_access.regexp
+    line: '/^unknown$/ REJECT'
+    create: yes
+  notify: restart postfix
+
 - name: tls_server_sni_maps の作成
   blockinfile:
     path: /etc/postfix/tls_server_sni_maps
