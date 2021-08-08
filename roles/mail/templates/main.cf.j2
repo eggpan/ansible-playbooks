@@ -10,7 +10,7 @@ myhostname = {{ myhostname }}
 smtpd_banner = mailserver ESMTP
 virtual_gid_maps = static:5000
 virtual_mailbox_base = /var/mail/vhosts
-virtual_mailbox_domains = {{ virtual_mailbox_domains | default("example.com") }}
+virtual_mailbox_domains = regexp:/etc/postfix/virtual_mailbox_domains.regexp
 virtual_mailbox_maps = regexp:/etc/postfix/virtual_mailbox_maps.regexp
 virtual_uid_maps = static:5000
 
@@ -28,11 +28,21 @@ smtp_tls_security_level = encrypt
 # smtp auth settings
 smtpd_sasl_path = private/auth
 smtpd_sasl_type = dovecot
-smtpd_sender_restrictions =
- check_sender_access regexp:/etc/postfix/sender_access.regexp
+smtpd_client_restrictions = permit_mynetworks,
+  check_client_access regexp:/etc/postfix/client_access.regexp
+  reject_rbl_client bl.spamcop.net,
+  reject_rbl_client sbl-xbl.spamhaus.org,
+  permit
 smtpd_tls_cert_file = /etc/ssl/certs/ssl-cert-snakeoil.pem
 smtpd_tls_key_file = /etc/ssl/private/ssl-cert-snakeoil.key
 smtpd_tls_security_level = may
 {% if tls_server_sni_maps is defined %}
 tls_server_sni_maps = hash:/etc/postfix/tls_server_sni_maps
+{% endif %}
+
+{% if opendkim_domainkeys is defined %}
+# DKIM settings
+milter_default_action = accept
+smtpd_milters = inet:localhost:8891
+non_smtpd_milters = $smtpd_milters
 {% endif %}

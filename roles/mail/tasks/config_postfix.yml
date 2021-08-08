@@ -35,6 +35,13 @@
     create: yes
   notify: restart postfix
 
+- name: virtual_mailbox_domains.regexp の作成
+  blockinfile:
+    path: /etc/postfix/virtual_mailbox_domains.regexp
+    block: '{{ virtual_mailbox_domains | default("/^example\.com$/ domain") }}'
+    create: yes
+  notify: restart postfix
+
 - name: virtual_mailbox_maps.regexp の作成
   blockinfile:
     path: /etc/postfix/virtual_mailbox_maps.regexp
