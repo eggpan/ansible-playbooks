@@ -29,10 +29,9 @@
     mode: 0700
 
 - name: header_checks.regexp の作成
-  lineinfile:
-    path: /etc/postfix/header_checks.regexp
-    line: '/^Received:/ IGNORE'
-    create: yes
+  ansible.builtin.copy:
+    dest: /etc/postfix/header_checks.regexp
+    content : '{{ header_checks | default("") }}'
   notify: restart postfix
 
 - name: virtual_mailbox_domains.regexp の作成
@@ -61,10 +60,10 @@
     - restart postfix
 
 - name: client_access.regexp の作成
-  lineinfile:
-    path: /etc/postfix/client_access.regexp
-    line: '/^unknown$/ REJECT'
-    create: yes
+  ansible.builtin.copy:
+    dest: /etc/postfix/client_access.regexp
+    content: |
+      /^unknown$/ REJECT
   notify: restart postfix
 
 - name: tls_server_sni_maps の作成
