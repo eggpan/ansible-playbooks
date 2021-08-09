@@ -14,3 +14,8 @@
   file:
     path: /etc/opendkim/keys/{{ item.domain }}/{{ item.selector }}.private
     owner: opendkim
+
+- name: txtのパーミッションを644に変更
+  file:
+    path: /etc/opendkim/keys/{{ item.domain }}/{{ item.selector }}.txt
+    mode: 0644

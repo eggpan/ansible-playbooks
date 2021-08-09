@@ -31,3 +31,9 @@
     owner: opendkim
     group: opendkim
     mode: 0775
+
+- name: postfixユーザーをopendkimグループに追加
+  ansible.builtin.user:
+    name: postfix
+    groups: opendkim
+    append: yes
