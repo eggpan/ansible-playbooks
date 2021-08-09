@@ -1,21 +1,21 @@
 ---
 - name: keyfile用のディレクトリ作成
-  file:
+  ansible.builtin.file:
     path: /etc/opendkim/keys/{{ item.domain }}
     state: directory
 
 - name: keyfileの作成
-  command: opendkim-genkey --domain={{ item.domain }} --selector={{ item.selector }} --directory=/etc/opendkim/keys/{{ item.domain }}
+  ansible.builtin.command: opendkim-genkey --domain={{ item.domain }} --selector={{ item.selector }} --directory=/etc/opendkim/keys/{{ item.domain }}
   args:
     creates: /etc/opendkim/keys/{{ item.domain }}/{{ item.selector }}.private
   notify: restart opendkim
 
 - name: keyfileのownerをopendkimに変更
-  file:
+  ansible.builtin.file:
     path: /etc/opendkim/keys/{{ item.domain }}/{{ item.selector }}.private
     owner: opendkim
 
 - name: txtのパーミッションを644に変更
-  file:
+  ansible.builtin.file:
     path: /etc/opendkim/keys/{{ item.domain }}/{{ item.selector }}.txt
     mode: 0644

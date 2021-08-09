@@ -1,6 +1,6 @@
 ---
 - name: dovecot mail_location設定
-  ini_file:
+  community.general.ini_file:
     path: /etc/dovecot/conf.d/10-mail.conf
     section: null
     option: mail_location
@@ -8,7 +8,7 @@
   notify: restart dovecot
 
 - name: dovecot auth-static.conf.extの有効化
-  lineinfile:
+  ansible.builtin.lineinfile:
     path: /etc/dovecot/conf.d/10-auth.conf
     regexp: '#(!include auth-static\.conf\.ext)'
     line: '\1'
@@ -16,7 +16,7 @@
   notify: restart dovecot
 
 - name: dovecot auth-passwdfile.conf.extの有効化
-  lineinfile:
+  ansible.builtin.lineinfile:
     path: /etc/dovecot/conf.d/10-auth.conf
     regexp: '#(!include auth-passwdfile\.conf\.ext)'
     line: '\1'
@@ -24,7 +24,7 @@
   notify: restart dovecot
 
 - name: auth-static.conf.extの設定
-  blockinfile:
+  ansible.builtin.blockinfile:
     path: /etc/dovecot/conf.d/auth-static.conf.ext
     block: |
       userdb {
@@ -33,7 +33,7 @@
       }
 
 - name: dovecot postfix連携用の設定
-  blockinfile:
+  ansible.builtin.blockinfile:
     path: /etc/dovecot/conf.d/10-postfix-auth.conf
     create: yes
     block: |
@@ -46,7 +46,7 @@
       }
 
 - name: users ファイルの作成
-  blockinfile:
+  ansible.builtin.blockinfile:
     path: /etc/dovecot/users
     block: '{{ dovecot.users }}'
     group: dovecot
@@ -56,7 +56,7 @@
   notify: restart dovecot
 
 - name: dovecot certs の設定
-  blockinfile:
+  ansible.builtin.blockinfile:
     path: /etc/dovecot/conf.d/10-ssl.conf
     block: '{{ dovecot.certs }}'
     create: yes

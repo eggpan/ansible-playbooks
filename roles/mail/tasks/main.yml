@@ -10,10 +10,10 @@
   ansible.builtin.import_tasks: config_postfix.yml
 
 - name: dovecotのコンフィグ設定
-  import_tasks: config_dovecot.yml
+  ansible.builtin.import_tasks: config_dovecot.yml
 
 - name: opendkimのコンフィグ設定
-  import_tasks: config_opendkim.yml
+  ansible.builtin.import_tasks: config_opendkim.yml
 
 - name: opendmarcのコンフィグ設定
-  import_tasks: config_opendmarc.yml
+  ansible.builtin.import_tasks: config_opendmarc.yml

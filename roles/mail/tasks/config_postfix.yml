@@ -21,7 +21,7 @@
   notify: restart postfix
 
 - name: メールボックス用ディレクトリの作成
-  file:
+  ansible.builtin.file:
     path: /var/mail/vhosts
     state: directory
     owner: "5000"
@@ -35,21 +35,21 @@
   notify: restart postfix
 
 - name: virtual_mailbox_domains.regexp の作成
-  blockinfile:
+  ansible.builtin.blockinfile:
     path: /etc/postfix/virtual_mailbox_domains.regexp
     block: '{{ virtual_mailbox_domains | default("/^example\.com$/ domain") }}'
     create: yes
   notify: restart postfix
 
 - name: virtual_mailbox_maps.regexp の作成
-  blockinfile:
+  ansible.builtin.blockinfile:
     path: /etc/postfix/virtual_mailbox_maps.regexp
     block: '{{ virtual_mailbox_maps | default("/^.+@example\.com$/ example.com/example/") }}'
     create: yes
   notify: restart postfix
 
 - name: smtp_sasl_password_maps の作成
-  blockinfile:
+  ansible.builtin.blockinfile:
     path: /etc/postfix/smtp_sasl_password_maps
     block: '{{ smtp_sasl_password_maps }}'
     mode: 0600
@@ -60,7 +60,7 @@
     - restart postfix
 
 - name: tls_server_sni_maps の作成
-  blockinfile:
+  ansible.builtin.blockinfile:
     path: /etc/postfix/tls_server_sni_maps
     block: '{{ tls_server_sni_maps }}'
     mode: 0600

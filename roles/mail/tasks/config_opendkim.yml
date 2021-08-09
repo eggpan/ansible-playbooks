@@ -6,7 +6,7 @@
   notify: restart opendkim
 
 - name: ドメインごとの keyfile 作成
-  include_tasks: config_opendkim_keyfile.yml
+  ansible.builtin.include_tasks: config_opendkim_keyfile.yml
   when: opendkim_domainkeys is defined
   loop: '{{ opendkim_domainkeys }}'
 
