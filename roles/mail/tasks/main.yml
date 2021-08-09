@@ -14,3 +14,6 @@
 
 - name: opendkimのコンフィグ設定
   import_tasks: config_opendkim.yml
+
+- name: opendmarcのコンフィグ設定
+  import_tasks: config_opendmarc.yml

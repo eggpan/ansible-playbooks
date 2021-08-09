@@ -19,3 +19,8 @@
   systemd:
     state: restarted
     name: opendkim
+
+- name: restart opendmarc
+  systemd:
+    state: restarted
+    name: opendmarc

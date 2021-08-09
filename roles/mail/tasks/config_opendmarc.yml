@@ -1,0 +1,21 @@
+---
+- name: opendmarcのコンフィグ設定
+  ansible.builtin.copy:
+    src: opendmarc.conf
+    dest: /etc/opendmarc.conf
+  notify: restart opendmarc
+
+
+- name: socketファイル用ディレクトリの作成
+  ansible.builtin.file:
+    path: /var/spool/postfix/run/opendmarc
+    state: directory
+    owner: opendmarc
+    group: opendmarc
+    mode: 0775
+
+- name: postfix ユーザーを opendmarc グループに追加
+  ansible.builtin.user:
+    name: postfix
+    groups: opendmarc
+    append: yes
