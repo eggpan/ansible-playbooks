@@ -9,18 +9,22 @@
   systemd:
     state: restarted
     name: postfix
+  ignore_errors: '{{ ansible_check_mode }}'
 
 - name: restart dovecot
   systemd:
     state: restarted
     name: dovecot
+  ignore_errors: '{{ ansible_check_mode }}'
 
 - name: restart opendkim
   systemd:
     state: restarted
     name: opendkim
+  ignore_errors: '{{ ansible_check_mode }}'
 
 - name: restart opendmarc
   systemd:
     state: restarted
     name: opendmarc
+  ignore_errors: '{{ ansible_check_mode }}'

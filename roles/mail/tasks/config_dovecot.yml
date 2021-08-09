@@ -14,6 +14,7 @@
     line: '\1'
     backrefs: yes
   notify: restart dovecot
+  ignore_errors: '{{ ansible_check_mode }}'
 
 - name: dovecot auth-passwdfile.conf.extの有効化
   ansible.builtin.lineinfile:
@@ -22,6 +23,7 @@
     line: '\1'
     backrefs: yes
   notify: restart dovecot
+  ignore_errors: '{{ ansible_check_mode }}'
 
 - name: auth-static.conf.extの設定
   ansible.builtin.blockinfile:
@@ -31,6 +33,7 @@
         driver = static
         args = uid=5000 gid=5000 home=/var/mail/vhosts/%d/%n
       }
+  ignore_errors: '{{ ansible_check_mode }}'
 
 - name: dovecot postfix連携用の設定
   ansible.builtin.blockinfile:
@@ -44,6 +47,7 @@
           group = postfix
         }
       }
+  ignore_errors: '{{ ansible_check_mode }}'
 
 - name: users ファイルの作成
   ansible.builtin.blockinfile:

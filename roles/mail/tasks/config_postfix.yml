@@ -19,6 +19,7 @@
         -o smtpd_relay_restrictions=permit_sasl_authenticated,reject
         -o milter_macro_daemon_name=ORIGINATING
   notify: restart postfix
+  ignore_errors: '{{ ansible_check_mode }}'
 
 - name: メールボックス用ディレクトリの作成
   ansible.builtin.file:

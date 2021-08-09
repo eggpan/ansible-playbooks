@@ -14,8 +14,10 @@
   ansible.builtin.file:
     path: /etc/opendkim/keys/{{ item.domain }}/{{ item.selector }}.private
     owner: opendkim
+  ignore_errors: '{{ ansible_check_mode }}'
 
 - name: txtのパーミッションを644に変更
   ansible.builtin.file:
     path: /etc/opendkim/keys/{{ item.domain }}/{{ item.selector }}.txt
     mode: 0644
+  ignore_errors: '{{ ansible_check_mode }}'
