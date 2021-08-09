@@ -5,6 +5,7 @@
       - dovecot-pop3d
       - dovecot-imapd
       - opendkim
+      - opendkim-tools
       - opendmarc
       - postfix
       - python3-certbot-dns-cloudflare

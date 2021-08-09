@@ -3,6 +3,7 @@
   ansible.builtin.copy:
     src: opendkim.conf
     dest: /etc/opendkim.conf
+  notify: restart opendkim
 
 - name: ドメインごとの keyfile 作成
   include_tasks: config_opendkim_keyfile.yml
@@ -14,9 +15,19 @@
     src: opendkim/SigningTable.j2
     dest: /etc/opendkim/SigningTable
   when: opendkim_domainkeys is defined
+  notify: restart opendkim
 
 - name: KeyTableの作成
   ansible.builtin.template:
     src: opendkim/KeyTable.j2
     dest: /etc/opendkim/KeyTable
   when: opendkim_domainkeys is defined
+  notify: restart opendkim
+
+- name: socketファイル用ディレクトリの作成
+  ansible.builtin.file:
+    path: /var/spool/postfix/run/opendkim
+    state: directory
+    owner: opendkim
+    group: opendkim
+    mode: 0775

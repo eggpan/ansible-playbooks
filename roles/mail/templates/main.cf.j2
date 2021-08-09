@@ -43,6 +43,7 @@ tls_server_sni_maps = hash:/etc/postfix/tls_server_sni_maps
 {% if opendkim_domainkeys is defined %}
 # DKIM settings
 milter_default_action = accept
-smtpd_milters = inet:localhost:8891
+smtpd_milters =
+  local:run/opendkim/opendkim.sock
 non_smtpd_milters = $smtpd_milters
 {% endif %}
