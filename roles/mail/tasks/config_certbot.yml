@@ -1,0 +1,23 @@
+---
+- name: cloudflare認証用ファイルの作成
+  ansible.builtin.copy:
+    dest: /etc/letsencrypt/cloudflare_secret.ini
+    content: |
+      dns_cloudflare_email = {{ dns_cloudflare.email }}
+      dns_cloudflare_api_key = {{ dns_cloudflare.api_key }}
+    mode: 0600
+
+- name: certbotコマンドの実行
+  ansible.builtin.command: >
+    certbot certonly
+    -n
+    --email {{ dns_cloudflare.email }}
+    --agree-tos
+    --dns-cloudflare
+    --dns-cloudflare-credentials /etc/letsencrypt/cloudflare_secret.ini
+    --dns-cloudflare-propagation-seconds 20
+    -d *.{{ item }}
+    -d {{ item }}
+  args:
+    creates: /etc/letsencrypt/live/{{ item }}/fullchain.pem
+  loop: '{{ certbot.domains }}'

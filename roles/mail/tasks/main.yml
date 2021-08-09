@@ -6,6 +6,13 @@
   ansible.builtin.import_tasks: install.yml
   tags: install
 
+- name: certbotのコンフィグ設定
+  ansible.builtin.import_tasks: config_certbot.yml
+  when: >
+    certbot.domains is defined
+    and dns_cloudflare.email is defined
+    and dns_cloudflare.api_key is defined
+
 - name: postfixのコンフィグ設定
   ansible.builtin.import_tasks: config_postfix.yml
 
