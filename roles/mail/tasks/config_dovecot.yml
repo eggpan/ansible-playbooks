@@ -49,6 +49,12 @@
       }
   ignore_errors: '{{ ansible_check_mode }}'
 
+- name: dovecot imapメールボックスの設定
+  ansible.builtin.copy:
+    src: 15-mailboxes.conf
+    dest: /etc/dovecot/conf.d/15-mailboxes.conf
+  notify: restart dovecot
+
 - name: users ファイルの作成
   ansible.builtin.blockinfile:
     path: /etc/dovecot/users
