@@ -25,11 +25,11 @@ smtp_sasl_password_maps = hash:/etc/postfix/smtp_sasl_password_maps
 smtp_sasl_security_options = noanonymous
 smtp_tls_security_level = encrypt
 
-# smtp auth settings
+# smtpd settings
 smtpd_sasl_path = private/auth
 smtpd_sasl_type = dovecot
-smtpd_client_restrictions = permit_mynetworks,
-  check_client_access regexp:/etc/postfix/client_access.regexp
+smtpd_client_restrictions =
+  permit_mynetworks,
   reject_rbl_client bl.spamcop.net,
   reject_rbl_client sbl-xbl.spamhaus.org,
   permit

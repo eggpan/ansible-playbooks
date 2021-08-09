@@ -59,13 +59,6 @@
     - postmap smtp_sasl_password_maps
     - restart postfix
 
-- name: client_access.regexp の作成
-  ansible.builtin.copy:
-    dest: /etc/postfix/client_access.regexp
-    content: |
-      /^unknown$/ REJECT
-  notify: restart postfix
-
 - name: tls_server_sni_maps の作成
   blockinfile:
     path: /etc/postfix/tls_server_sni_maps
