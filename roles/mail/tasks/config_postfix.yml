@@ -6,7 +6,7 @@
   notify: restart postfix
 
 - name: postfix/master.cf submissionポートの設定
-  blockinfile:
+  ansible.builtin.blockinfile:
     path: /etc/postfix/master.cf
     insertbefore: '^#smtps'
     block: |
