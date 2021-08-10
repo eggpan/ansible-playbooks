@@ -2,5 +2,5 @@
 all:
   hosts:
     aws-mail:
-      ansible_host: 35.75.189.173
+      ansible_host: 3.115.99.95
       ansible_ssh_user: ubuntu
