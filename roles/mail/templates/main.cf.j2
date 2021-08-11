@@ -10,7 +10,7 @@ myhostname = {{ myhostname }}
 smtpd_banner = mailserver ESMTP
 virtual_gid_maps = static:5000
 virtual_mailbox_base = /var/mail/vhosts
-virtual_mailbox_domains = regexp:/etc/postfix/virtual_mailbox_domains.regexp
+virtual_mailbox_domains = {{ virtual_mailbox_domains }}
 virtual_mailbox_maps = regexp:/etc/postfix/virtual_mailbox_maps.regexp
 virtual_uid_maps = static:5000
 

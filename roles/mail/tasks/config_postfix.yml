@@ -35,37 +35,27 @@
     content : '{{ header_checks | default("") }}'
   notify: restart postfix
 
-- name: virtual_mailbox_domains.regexp の作成
-  ansible.builtin.blockinfile:
-    path: /etc/postfix/virtual_mailbox_domains.regexp
-    block: '{{ virtual_mailbox_domains | default("/^example\.com$/ domain") }}'
-    create: yes
-  notify: restart postfix
-
 - name: virtual_mailbox_maps.regexp の作成
-  ansible.builtin.blockinfile:
-    path: /etc/postfix/virtual_mailbox_maps.regexp
-    block: '{{ virtual_mailbox_maps | default("/^.+@example\.com$/ example.com/example/") }}'
-    create: yes
+  ansible.builtin.copy:
+    dest: /etc/postfix/virtual_mailbox_maps.regexp
+    content: '{{ virtual_mailbox_maps | default("/^.+@example\.com$/ example.com/example/") }}'
   notify: restart postfix
 
 - name: smtp_sasl_password_maps の作成
-  ansible.builtin.blockinfile:
-    path: /etc/postfix/smtp_sasl_password_maps
-    block: '{{ smtp_sasl_password_maps }}'
+  ansible.builtin.copy:
+    dest: /etc/postfix/smtp_sasl_password_maps
+    content: '{{ smtp_sasl_password_maps }}'
     mode: 0600
-    create: yes
   when: smtp_sasl_password_maps is defined
   notify:
     - postmap smtp_sasl_password_maps
     - restart postfix
 
 - name: tls_server_sni_maps の作成
-  ansible.builtin.blockinfile:
-    path: /etc/postfix/tls_server_sni_maps
-    block: '{{ tls_server_sni_maps }}'
+  ansible.builtin.copy:
+    dest: /etc/postfix/tls_server_sni_maps
+    content: '{{ tls_server_sni_maps }}'
     mode: 0600
-    create: yes
   when: tls_server_sni_maps is defined
   notify:
     - postmap tls_server_sni_maps
