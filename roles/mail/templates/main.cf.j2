@@ -44,7 +44,7 @@ tls_server_sni_maps = hash:/etc/postfix/tls_server_sni_maps
 # DKIM settings
 milter_default_action = accept
 smtpd_milters =
-  local:run/opendmarc/opendmarc.sock,
-  local:run/opendkim/opendkim.sock
+  local:run/opendkim/opendkim.sock,
+  local:run/opendmarc/opendmarc.sock
 non_smtpd_milters = $smtpd_milters
 {% endif %}
