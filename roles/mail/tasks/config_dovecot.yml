@@ -4,7 +4,7 @@
     path: /etc/dovecot/conf.d/10-mail.conf
     section: null
     option: mail_location
-    value: "maildir:/var/mail/vhosts/%d/%n"
+    value: "maildir:{{ virtual_mailbox_base }}/%d/%n"
   notify: restart dovecot
 
 - name: dovecot auth-static.conf.extの有効化
@@ -31,7 +31,7 @@
     block: |
       userdb {
         driver = static
-        args = uid=5000 gid=5000 home=/var/mail/vhosts/%d/%n
+        args = uid=5000 gid=5000 home={{ virtual_mailbox_base }}/%d/%n
       }
   ignore_errors: '{{ ansible_check_mode }}'
 

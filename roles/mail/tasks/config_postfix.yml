@@ -23,7 +23,7 @@
 
 - name: メールボックス用ディレクトリの作成
   ansible.builtin.file:
-    path: /var/mail/vhosts
+    path: '{{ virtual_mailbox_base }}'
     state: directory
     owner: "5000"
     group: "5000"
