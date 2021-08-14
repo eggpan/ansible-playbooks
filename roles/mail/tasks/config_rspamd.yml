@@ -1,0 +1,32 @@
+---
+- name: socketファイル用ディレクトリの作成
+  ansible.builtin.file:
+    path: /var/spool/postfix/run
+    state: directory
+
+- name: keyfile用のディレクトリ作成
+  ansible.builtin.file:
+    path: /etc/rspamd/local.d/keys
+    state: directory
+
+- name: ドメインごとのkeyfile作成
+  ansible.builtin.include_tasks: config_rspamd_keyfile.yml
+  when: domainkeys is defined
+  loop: '{{ domainkeys }}'
+
+- name: 各種設定ファイルの作成
+  ansible.builtin.copy:
+    src: rspamd/{{ item }}
+    dest: /etc/rspamd/local.d/{{ item }}
+  loop:
+    - classifier-bayes.conf
+    - milter_headers.conf
+    - redis.conf
+    - worker-proxy.inc
+
+- name: dkim_signing.confの作成
+  ansible.builtin.template:
+    src: rspamd/dkim_signing.conf.j2
+    dest: /etc/rspamd/local.d/dkim_signing.conf
+  when: domainkeys is defined
+  notify: restart rspamd

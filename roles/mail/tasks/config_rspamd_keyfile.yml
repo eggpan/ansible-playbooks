@@ -1,0 +1,15 @@
+---
+- name: '{{ item.selector }}._domainkey.{{ item.domain }} keyfileの作成'
+  ansible.builtin.shell: >
+    rspamadm dkim_keygen -d {{ item.domain }} -s {{ item.selector }}
+    -k /etc/rspamd/local.d/keys/{{ item.domain }}.{{ item.selector }}.key
+    | sudo tee /etc/rspamd/local.d/keys/{{ item.domain }}.{{ item.selector }}.txt
+  args:
+    creates: /etc/rspamd/local.d/keys/{{ item.domain }}.{{ item.selector }}.key
+  notify: restart rspamd
+
+- name: keyfileのownerを_rspamdに変更
+  ansible.builtin.file:
+    path: /etc/rspamd/local.d/keys/{{ item.domain }}.{{ item.selector }}.key
+    owner: _rspamd
+  ignore_errors: '{{ ansible_check_mode }}'

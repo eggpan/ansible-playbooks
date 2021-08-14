@@ -6,11 +6,9 @@
       - dovecot-mysql
       - dovecot-pop3d
       - mariadb-server
-      - opendkim
-      - opendkim-tools
-      - opendmarc
       - postfix
       - postfix-mysql
       - python3-certbot-dns-cloudflare
+      - rspamd
     force_apt_get: yes
     update_cache: yes

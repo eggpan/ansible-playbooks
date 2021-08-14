@@ -17,14 +17,8 @@
     name: dovecot
   ignore_errors: '{{ ansible_check_mode }}'
 
-- name: restart opendkim
+- name: restart rspamd
   systemd:
     state: restarted
-    name: opendkim
-  ignore_errors: '{{ ansible_check_mode }}'
-
-- name: restart opendmarc
-  systemd:
-    state: restarted
-    name: opendmarc
+    name: rspamd
   ignore_errors: '{{ ansible_check_mode }}'

@@ -1,0 +1,17 @@
+allow_hdrfrom_mismatch = true;
+allow_hdrfrom_mismatch_sign_networks = true;
+allow_username_mismatch = true;
+use_domain = "header";
+auth_only = true;
+use_esld = false;
+
+{% if domainkeys is defined %}
+domain {
+{% for item in domainkeys %}
+    {{ item.domain }} {
+        selector = "{{ item.selector }}";
+        path = "/etc/rspamd/local.d/keys/{{ item.domain }}.{{ item.selector }}.key";
+    }
+{% endfor %}
+}
+{% endif %}
