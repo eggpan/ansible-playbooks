@@ -1,4 +1,9 @@
 ---
+- name: hostnameをセット
+  ansible.builtin.hostname:
+    name: '{{ hostname }}'
+  when: hostname is defined
+
 - name: タイムゾーンをAsia/Tokyoにセット
   community.general.timezone:
     name: Asia/Tokyo
