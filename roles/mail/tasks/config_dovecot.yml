@@ -39,7 +39,7 @@
     path: /etc/dovecot/dovecot-sql.conf.ext
     block: |
       driver = mysql
-      connect = host=localhost dbname=mail user=mail password=password
+      connect = host=localhost dbname=mail user=mail password={{ database.password }}
       default_pass_scheme = PLAIN
       password_query = SELECT username AS user, domain, password FROM users WHERE username = '%n' AND domain = '%d' AND is_active = 1
       user_query = SELECT CONCAT('{{ virtual_mailbox_base }}/', domain, '/', username, '/') as home, 5000 as uid, 5000 as gid FROM users WHERE username = '%n' AND domain = '%d' AND is_active = 1
