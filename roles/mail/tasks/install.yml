@@ -2,12 +2,15 @@
 - name: 各種パッケージのインストール
   ansible.builtin.apt:
     name:
-      - dovecot-pop3d
       - dovecot-imapd
+      - dovecot-mysql
+      - dovecot-pop3d
+      - mariadb-server
       - opendkim
       - opendkim-tools
       - opendmarc
       - postfix
+      - postfix-mysql
       - python3-certbot-dns-cloudflare
     force_apt_get: yes
     update_cache: yes

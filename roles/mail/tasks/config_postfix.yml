@@ -35,11 +35,21 @@
     content : '{{ header_checks | default("") }}'
   notify: restart postfix
 
-- name: virtual_mailbox_maps.regexp の作成
+- name: virtual_mailbox_maps.cf の作成
   ansible.builtin.copy:
-    dest: /etc/postfix/virtual_mailbox_maps.regexp
-    content: '{{ virtual_mailbox_maps | default("/^.+@example\.com$/ example.com/example/") }}'
+    dest: /etc/postfix/virtual_mailbox_maps.cf
+    content: |
+      user = mail
+      password = password
+      hosts = 127.0.0.1
+      dbname = mail
+      query = SELECT destination FROM mailbox_maps
+        WHERE (address = '%s' AND is_regexp = 0 AND is_active = 1) OR ('%s' REGEXP address AND is_regexp = 1 AND is_active = 1)
   notify: restart postfix
+
+- name: maibox_mapsへのデータ追加
+  ansible.builtin.include_tasks: config_postfix_maibox_map.yml
+  loop: '{{ virtual_mailbox_maps }}'
 
 - name: smtp_sasl_password_maps の作成
   ansible.builtin.copy:

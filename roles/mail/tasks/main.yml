@@ -13,6 +13,9 @@
     and dns_cloudflare.email is defined
     and dns_cloudflare.api_key is defined
 
+- name: データベースの設定
+  ansible.builtin.import_tasks: config_database.yml
+
 - name: postfixのコンフィグ設定
   ansible.builtin.import_tasks: config_postfix.yml
 

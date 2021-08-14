@@ -7,39 +7,19 @@
     value: "maildir:{{ virtual_mailbox_base }}/%d/%n"
   notify: restart dovecot
 
-- name: dovecot auth-static.conf.extの有効化
+- name: dovecot auth-sql.conf.extの有効化
   ansible.builtin.lineinfile:
     path: /etc/dovecot/conf.d/10-auth.conf
-    regexp: '#(!include auth-static\.conf\.ext)'
+    regexp: '#(!include auth-sql\.conf\.ext)'
     line: '\1'
     backrefs: yes
   notify: restart dovecot
-  ignore_errors: '{{ ansible_check_mode }}'
-
-- name: dovecot auth-passwdfile.conf.extの有効化
-  ansible.builtin.lineinfile:
-    path: /etc/dovecot/conf.d/10-auth.conf
-    regexp: '#(!include auth-passwdfile\.conf\.ext)'
-    line: '\1'
-    backrefs: yes
-  notify: restart dovecot
-  ignore_errors: '{{ ansible_check_mode }}'
-
-- name: auth-static.conf.extの設定
-  ansible.builtin.blockinfile:
-    path: /etc/dovecot/conf.d/auth-static.conf.ext
-    block: |
-      userdb {
-        driver = static
-        args = uid=5000 gid=5000 home={{ virtual_mailbox_base }}/%d/%n
-      }
   ignore_errors: '{{ ansible_check_mode }}'
 
 - name: dovecot postfix連携用の設定
-  ansible.builtin.blockinfile:
-    path: /etc/dovecot/conf.d/10-postfix-auth.conf
-    create: yes
-    block: |
+  ansible.builtin.copy:
+    dest: /etc/dovecot/conf.d/10-postfix-auth.conf
+    content: |
       service auth {
         unix_listener /var/spool/postfix/private/auth {
           mode = 0660
@@ -47,7 +27,6 @@
           group = postfix
         }
       }
-  ignore_errors: '{{ ansible_check_mode }}'
 
 - name: dovecot imapメールボックスの設定
   ansible.builtin.copy:
@@ -55,17 +34,23 @@
     dest: /etc/dovecot/conf.d/15-mailboxes.conf
   notify: restart dovecot
 
-- name: users ファイルの作成
+- name: dovecot 認証用sqlの設定
   ansible.builtin.blockinfile:
-    path: /etc/dovecot/users
-    block: '{{ dovecot.users }}'
-    group: dovecot
-    mode: 0640
-    create: yes
-  when: dovecot.users is defined
+    path: /etc/dovecot/dovecot-sql.conf.ext
+    block: |
+      driver = mysql
+      connect = host=localhost dbname=mail user=mail password=password
+      default_pass_scheme = PLAIN
+      password_query = SELECT username AS user, domain, password FROM users WHERE username = '%n' AND domain = '%d' AND is_active = 1
+      user_query = SELECT CONCAT('{{ virtual_mailbox_base }}/', domain, '/', username, '/') as home, 5000 as uid, 5000 as gid FROM users WHERE username = '%n' AND domain = '%d' AND is_active = 1
   notify: restart dovecot
+  ignore_errors: '{{ ansible_check_mode }}'
 
-- name: dovecot certs の設定
+- name: dovecot 認証ユーザーの追加
+  ansible.builtin.include_tasks: config_dovecot_user.yml
+  loop: '{{ dovecot.users }}'
+
+- name: dovecot ssl証明書の設定
   ansible.builtin.blockinfile:
     path: /etc/dovecot/conf.d/10-ssl.conf
     block: '{{ dovecot.certs }}'

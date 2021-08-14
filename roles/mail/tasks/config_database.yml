@@ -1,0 +1,53 @@
+---
+- name: mailユーザーのログインチェック
+  command: mysql -u mail -p'{{ database.password }}' mail -e 'quit'
+  register: check_mail_user
+  changed_when: false
+  check_mode: no
+  ignore_errors: yes
+
+- name: データベース、ユーザーの作成
+  command: >
+    mysql -e "
+      CREATE DATABASE IF NOT EXISTS mail;
+      CREATE USER IF NOT EXISTS mail;
+      GRANT ALL ON mail.* TO mail IDENTIFIED BY '{{ database.password }}';
+    "
+  when: check_mail_user.rc != 0
+
+- name: テーブル一覧取得
+  command: mysql mail -N -e "show tables"
+  register: mail_tables
+  changed_when: false
+
+- name: usersテーブルの作成
+  command: >
+    mysql mail -e "
+      CREATE TABLE users (
+        id int NOT NULL AUTO_INCREMENT,
+        username VARCHAR(128) NOT NULL,
+        domain VARCHAR(128) NOT NULL,
+        password VARCHAR(64) NOT NULL,
+        is_active TINYINT(1) DEFAULT 1 NOT NULL,
+        PRIMARY KEY (id),
+        UNIQUE KEY username_domain (username, domain)
+      );
+    "
+  when: "'users' not in mail_tables.stdout_lines"
+  ignore_errors: "{{ ansible_check_mode }}"
+
+- name: mailbox_mapsテーブルの作成
+  command: >
+    mysql mail -e "
+      CREATE TABLE mailbox_maps (
+        id INT NOT NULL AUTO_INCREMENT,
+        address VARCHAR(255) NOT NULL,
+        destination VARCHAR(255) NOT NULL,
+        is_regexp TINYINT(1) DEFAULT 0 NOT NULL,
+        is_active TINYINT(1) DEFAULT 1 NOT NULL,
+        PRIMARY KEY (id),
+        UNIQUE KEY (address)
+      );
+    "
+  when: "'mailbox_maps' not in mail_tables.stdout_lines"
+  ignore_errors: "{{ ansible_check_mode }}"

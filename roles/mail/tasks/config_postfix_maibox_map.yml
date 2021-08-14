@@ -1,0 +1,15 @@
+---
+- name: mailbox_mapsへの登録チェック
+  command: >
+    mysql mail -N -e "SELECT 1 FROM mailbox_maps WHERE address = '{{ item.address }}'"
+  register: address_exists
+  changed_when: false
+
+- name: 'メールボックス {{ item.address }} の追加'
+  command: >
+    mysql mail -e "
+      INSERT INTO mailbox_maps(address, destination, is_regexp)
+      VALUES ('{{ item.address }}', '{{ item.destination }}', {{ item.is_regexp | default(0) }});
+    "
+  when: address_exists.stdout_lines | length == 0
+  ignore_errors: "{{ ansible_check_mode }}"

@@ -1,0 +1,15 @@
+---
+- name: usersへの登録チェック
+  command: >
+    mysql mail -N -e "SELECT 1 FROM users WHERE username = '{{ item.username }}' AND domain = '{{ item.domain }}'"
+  register: user_exists
+  changed_when: false
+
+- name: 'ユーザー {{ item.username }}@{{ item.domain }} の追加'
+  command: >
+    mysql mail -e "
+      INSERT INTO users(username, domain, password)
+      VALUES ('{{ item.username }}', '{{ item.domain }}', '{{ item.password }}');
+    "
+  when: user_exists.stdout_lines | length == 0
+  ignore_errors: "{{ ansible_check_mode }}"
