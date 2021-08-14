@@ -23,6 +23,7 @@
     - milter_headers.conf
     - redis.conf
     - worker-proxy.inc
+  notify: restart rspamd
 
 - name: dkim_signing.confの作成
   ansible.builtin.template:
