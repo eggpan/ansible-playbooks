@@ -7,3 +7,17 @@
 - name: タイムゾーンをAsia/Tokyoにセット
   community.general.timezone:
     name: Asia/Tokyo
+
+- name: swapファイルの作成
+  shell: dd if=/dev/zero of=/swapfile bs=1M count=1024 && mkswap /swapfile && swapon /swapfile
+  args:
+    creates:
+      /swapfile
+
+- name: mount /swapfile
+  ansible.posix.mount:
+    src: /swapfile
+    name: swap
+    fstype: swap
+    opts: defaults
+    state: present
