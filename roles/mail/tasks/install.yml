@@ -6,9 +6,11 @@
       - dovecot-mysql
       - dovecot-pop3d
       - mariadb-server
+      - nginx
       - postfix
       - postfix-mysql
       - python3-certbot-dns-cloudflare
+      - redis
       - rspamd
     force_apt_get: yes
     update_cache: yes

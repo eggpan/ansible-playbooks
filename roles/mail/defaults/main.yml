@@ -17,3 +17,5 @@ dovecot:
     - username: example
       domain: example.net
       password: '{PLAIN}password'
+rspamd:
+  domain: example.com

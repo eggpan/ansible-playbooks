@@ -22,3 +22,9 @@
     state: restarted
     name: rspamd
   ignore_errors: '{{ ansible_check_mode }}'
+
+- name: restart nginx
+  systemd:
+    state: restarted
+    name: nginx
+  ignore_errors: '{{ ansible_check_mode }}'

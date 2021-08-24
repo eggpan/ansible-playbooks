@@ -24,4 +24,6 @@
 
 - name: rspamdのコンフィグ設定
   ansible.builtin.import_tasks: config_rspamd.yml
-  
+
+- name: nginxのコンフィグ設定
+  ansible.builtin.import_tasks: config_nginx.yml
