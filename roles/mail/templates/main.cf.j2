@@ -7,6 +7,7 @@ home_mailbox = Maildir/
 {% if myhostname is defined %}
 myhostname = {{ myhostname }}
 {% endif %}
+inet_protocols = ipv4
 smtpd_banner = mailserver ESMTP
 virtual_gid_maps = static:5000
 virtual_mailbox_base = {{ virtual_mailbox_base }}
@@ -23,7 +24,7 @@ smtp_sasl_auth_enable = yes
 smtp_sasl_password_maps = hash:/etc/postfix/smtp_sasl_password_maps
 {% endif %}
 smtp_sasl_security_options = noanonymous
-smtp_tls_security_level = encrypt
+smtp_tls_security_level = may
 
 # smtpd settings
 smtpd_sasl_path = private/auth
