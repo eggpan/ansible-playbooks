@@ -1,0 +1,25 @@
+---
+- name: install software-properties-common
+  ansible.builtin.apt:
+    name:
+    - software-properties-common
+    force_apt_get: yes
+    update_cache: yes
+
+- name: add php repository
+  ansible.builtin.apt_repository:
+    repo: ppa:ondrej/php
+
+- name: add mariadb repository
+  ansible.builtin.shell: curl -sS https://downloads.mariadb.com/MariaDB/mariadb_repo_setup | bash
+  args:
+    creates: /etc/apt/sources.list.d/mariadb.list
+
+- name: add yarn GPG key
+  ansible.builtin.apt_key:
+    url: https://dl.yarnpkg.com/debian/pubkey.gpg
+
+- name: add yarn repository
+  ansible.builtin.apt_repository:
+    repo: deb https://dl.yarnpkg.com/debian/ stable main
+    filename: yarn

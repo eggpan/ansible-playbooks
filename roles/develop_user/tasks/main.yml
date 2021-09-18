@@ -1,0 +1,21 @@
+---
+- name: install nvm
+  ansible.builtin.shell: >
+    curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/{{ nvm_version }}/install.sh | bash
+  register: install_nvm
+  args:
+    creates: '{{ ansible_env.HOME }}/.nvm/nvm.sh'
+
+- name: install nodejs
+  ansible.builtin.shell: >
+    source ~/.nvm/nvm.sh
+    && nvm install --lts
+    && nvm install node
+  args:
+    executable: /bin/bash
+  when: install_nvm.changed
+
+- name: create public_html directory
+  ansible.builtin.file:
+    path: '{{ ansible_env.HOME }}/public_html'
+    state: directory

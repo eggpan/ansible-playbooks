@@ -1,0 +1,53 @@
+---
+- name: import task add_repositories
+  ansible.builtin.import_tasks: add_repositories.yml
+
+- name: import task install
+  ansible.builtin.import_tasks: install.yml
+
+- name: apache - enable proxy_fcgi module
+  community.general.apache2_module:
+    name: proxy_fcgi
+
+- name: apache - check 000-default.conf
+  ansible.builtin.stat:
+    path: /etc/apache2/sites-enabled/000-default.conf
+  register: apache_default_conf
+
+- name: apache - disable 000-default.conf
+  ansible.builtin.command: a2dissite 000-default.conf
+  when: apache_default_conf.stat.exists
+  notify: restart apache2
+
+- name: apache - copy sites-available/001-develop.conf
+  ansible.builtin.template:
+    src: 001-develop.conf.j2
+    dest: /etc/apache2/sites-available/001-develop.conf
+  notify: restart apache2
+
+- name: apache - check 001-develop.conf
+  ansible.builtin.stat:
+    path: /etc/apache2/sites-enabled/001-develop.conf
+  register: apache_develop_conf
+
+- name: apache - enable 001-develop.conf
+  ansible.builtin.command: a2ensite 001-develop.conf
+  when: not apache_develop_conf.stat.exists
+  notify: restart apache2
+
+- name: php - changed php-fpm user to {{ ansible_env.USER }}
+  community.general.ini_file:
+    path: '{{ item.conf }}'
+    section: www
+    option: '{{ item.option }}'
+    value: '{{ ansible_env.USER }}'
+  loop:
+    - conf: /etc/php/7.4/fpm/pool.d/www.conf
+      option: user
+    - conf: /etc/php/7.4/fpm/pool.d/www.conf
+      option: listen.owner
+    - conf: /etc/php/8.0/fpm/pool.d/www.conf
+      option: user
+    - conf: /etc/php/8.0/fpm/pool.d/www.conf
+      option: listen.owner
+  notify: restart php-fpm

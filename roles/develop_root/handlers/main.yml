@@ -1,0 +1,13 @@
+---
+- name: restart apache2
+  ansible.builtin.systemd:
+    state: restarted
+    name: apache2
+
+- name: restart php-fpm
+  ansible.builtin.systemd:
+    state: restarted
+    name: '{{ item }}'
+  loop:
+    - php7.4-fpm
+    - php8.0-fpm
