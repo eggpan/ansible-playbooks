@@ -1,0 +1,6 @@
+- hosts:
+    - develop
+  roles:
+    - role: develop_root
+      become: yes
+    - role: develop_user
