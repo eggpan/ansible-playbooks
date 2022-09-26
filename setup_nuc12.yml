@@ -1,0 +1,5 @@
+- hosts:
+    - nuc12
+  roles:
+    - role: nuc12
+      become: yes
