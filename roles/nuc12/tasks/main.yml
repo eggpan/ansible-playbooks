@@ -13,6 +13,7 @@
 - name: Install apt packages
   ansible.builtin.apt:
     name:
+      - autofs
       - bash-completion
       - containerd.io
       - docker-ce
