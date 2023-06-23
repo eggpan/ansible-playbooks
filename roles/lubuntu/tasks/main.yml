@@ -1,0 +1,17 @@
+---
+- name: Add repository for LXQt
+  apt_repository:
+    repo: ppa:lubuntu-dev/backports
+    state: present
+
+- name: Update and upgrade all packages
+  apt:
+    update_cache: yes
+    upgrade: full
+
+- name: Install packages
+  apt:
+    name:
+      - fcitx5-mozc
+      - fonts-takao
+    state: present
