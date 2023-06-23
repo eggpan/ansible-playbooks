@@ -1,30 +1,42 @@
 ---
 - name: Add repository for LXQt
-  apt_repository:
+  ansible.builtin.apt_repository:
     repo: ppa:lubuntu-dev/backports
     state: present
 
-- name: Import Microsoft GPG key
-  apt_key:
+- name: Download Microsoft GPG key
+  ansible.builtin.get_url:
     url: https://packages.microsoft.com/keys/microsoft.asc
-    state: present
+    dest: /etc/apt/trusted.gpg.d/microsoft.asc
+  become: yes
 
-- name: Add Visual Studio Code repository
-  apt_repository:
-    repo: deb [arch=amd64,arm64,armhf] http://packages.microsoft.com/repos/vscode stable main
+- name: Add Microsoft repository
+  ansible.builtin.apt_repository:
+    repo: deb [arch=amd64,arm64 signed-by=/etc/apt/trusted.gpg.d/microsoft.asc] https://packages.microsoft.com/repos/vscode stable main
     state: present
+  become: yes
 
 - name: Update and upgrade all packages
-  apt:
+  ansible.builtin.apt:
     update_cache: yes
     upgrade: full
 
 - name: Install packages
-  apt:
+  ansible.builtin.apt:
     name:
       - code
       - curl
       - fcitx5-mozc
       - fonts-takao
       - jq
+    state: present
+
+- name: Download Google Chrome deb
+  ansible.builtin.get_url:
+    url: https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
+    dest: /tmp/google-chrome-stable_current_amd64.deb
+
+- name: Install Google Chrome
+  ansible.builtin.apt:
+    deb: /tmp/google-chrome-stable_current_amd64.deb
     state: present
