@@ -4,6 +4,16 @@
     repo: ppa:lubuntu-dev/backports
     state: present
 
+- name: Import Microsoft GPG key
+  apt_key:
+    url: https://packages.microsoft.com/keys/microsoft.asc
+    state: present
+
+- name: Add Visual Studio Code repository
+  apt_repository:
+    repo: deb [arch=amd64,arm64,armhf] http://packages.microsoft.com/repos/vscode stable main
+    state: present
+
 - name: Update and upgrade all packages
   apt:
     update_cache: yes
@@ -12,6 +22,9 @@
 - name: Install packages
   apt:
     name:
+      - code
+      - curl
       - fcitx5-mozc
       - fonts-takao
+      - jq
     state: present
