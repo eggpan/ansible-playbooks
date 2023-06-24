@@ -1,20 +1,44 @@
 ---
-- name: Add repository for LXQt
-  ansible.builtin.apt_repository:
-    repo: ppa:lubuntu-dev/backports
-    state: present
+- name: Get architecture
+  ansible.builtin.command: dpkg --print-architecture
+  register: architecture
+  changed_when: no
+
+- name: Download Docker GPG key
+  ansible.builtin.get_url:
+    url: https://download.docker.com/linux/ubuntu/gpg
+    dest: /etc/apt/keyrings/docker.asc
+
+- name: Download Lubuntu GPG key
+  ansible.builtin.get_url:
+    url: https://keyserver.ubuntu.com/pks/lookup?op=get&search=0x91732a319f3e38eeedbdf51ac8beb4c320e36f2f
+    dest: /etc/apt/keyrings/lubuntu-dev-backports.asc
 
 - name: Download Microsoft GPG key
   ansible.builtin.get_url:
     url: https://packages.microsoft.com/keys/microsoft.asc
-    dest: /etc/apt/trusted.gpg.d/microsoft.asc
-  become: yes
+    dest: /etc/apt/keyrings/microsoft.asc
+
+- name: Add docker repository
+  ansible.builtin.apt_repository:
+    repo: "deb [arch={{ architecture.stdout }} signed-by=/etc/apt/keyrings/docker.asc] https://download.docker.com/linux/ubuntu {{ ansible_distribution_release }} stable"
+
+- name: Add Lubuntu repository
+  ansible.builtin.apt_repository:
+    repo: deb [arch={{ architecture.stdout }} signed-by=/etc/apt/keyrings/lubuntu-dev-backports.asc] http://ppa.launchpad.net/lubuntu-dev/backports/ubuntu {{ ansible_distribution_release }} main
 
 - name: Add Microsoft repository
   ansible.builtin.apt_repository:
-    repo: deb [arch=amd64,arm64 signed-by=/etc/apt/trusted.gpg.d/microsoft.asc] https://packages.microsoft.com/repos/vscode stable main
-    state: present
-  become: yes
+    repo: deb [arch={{ architecture.stdout }} signed-by=/etc/apt/keyrings/microsoft.asc] https://packages.microsoft.com/repos/vscode stable main
+
+- name: Download Google Chrome deb
+  ansible.builtin.get_url:
+    url: https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
+    dest: /tmp/google-chrome-stable_current_amd64.deb
+
+- name: Install Google Chrome
+  ansible.builtin.apt:
+    deb: /tmp/google-chrome-stable_current_amd64.deb
 
 - name: Update and upgrade all packages
   ansible.builtin.apt:
@@ -26,17 +50,7 @@
     name:
       - code
       - curl
+      - docker-ce
       - fcitx5-mozc
       - fonts-takao
       - jq
-    state: present
-
-- name: Download Google Chrome deb
-  ansible.builtin.get_url:
-    url: https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
-    dest: /tmp/google-chrome-stable_current_amd64.deb
-
-- name: Install Google Chrome
-  ansible.builtin.apt:
-    deb: /tmp/google-chrome-stable_current_amd64.deb
-    state: present
