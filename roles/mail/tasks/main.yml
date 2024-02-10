@@ -45,3 +45,14 @@
               - 10.0.0.101/24
             gateway4: 10.0.0.1
   notify: apply netplan
+
+- name: Add SNAT rule to docker service configuration
+  blockinfile:
+    path: /etc/systemd/system/docker.service.d/add-snat-secondary-address.conf
+    block: |
+      [Service]
+      ExecStartPost=iptables -t nat -A POSTROUTING -s 172.16.101.0/24 -o ens3 -j SNAT --to-source 10.0.0.101
+    create: yes
+  notify:
+    - systemd daemon-reload 
+    - restart docker
