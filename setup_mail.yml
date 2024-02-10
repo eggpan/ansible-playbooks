@@ -1,5 +1,5 @@
 - hosts:
-    - aws-mail
+    - mail
   roles:
     - role: mail
   become: yes
