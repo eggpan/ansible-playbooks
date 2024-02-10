@@ -20,7 +20,10 @@
       - docker-ce-cli
       - docker-compose-plugin
       - git-crypt
+      - hdparm
       - mariadb-client
+      - postfix
+      - rsyslog
       - unzip
       - vim
       - zip
@@ -30,3 +33,16 @@
     name: "{{ ansible_env['USER'] }}"
     groups: docker
     append: yes
+
+- name: autofs config (/etc/auto.master.d/direct.autofs)
+  ansible.builtin.copy:
+    dest: /etc/auto.master.d/direct.autofs
+    content: |
+      /-    /etc/auto.direct
+
+- name: autofs config (/etc/auto.direct)
+  ansible.builtin.copy:
+    dest: /etc/auto.direct
+    content: |
+      /mnt/usbdisk -fstype=xfs,rw :/dev/disk/by-uuid/5e6ea472-4bf6-43f5-a51e-414284ab1b6e
+      /mnt/usbdisk-backup -fstype=xfs,rw :/dev/disk/by-uuid/241a4727-188d-44e2-a975-648847037f94
